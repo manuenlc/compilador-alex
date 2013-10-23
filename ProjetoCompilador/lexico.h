@@ -17,6 +17,13 @@ typedef struct token_no
 	struct token_no *proximo_token;
 } token_no;
 
+typedef struct token_id_no
+{
+	int token2;
+	char valor_id[ID_TAM_MAX];
+	struct token_id_no *proximo;
+} token_id_no;
+
 
 /** funções */
 
