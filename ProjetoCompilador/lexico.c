@@ -14,8 +14,23 @@
 #include "boolean.h"
 
 
+/* variaveis globais */
+int nome_lido_tam;
+char nome_lido[ID_TAM_MAX];
+
+
 /* funções */
 void print_token(token* to_print);
+void add_char_to_nome_lido(char c);
+
+void add_char_to_nome_lido(char c)
+{
+	if(nome_lido_tam < ID_TAM_MAX - 1) printf("nome maior que o máximo permitido");
+	else
+	{
+		nome_lido[nome_lido_tam++] = c;
+	}
+}
 
 
 void print_token(token* to_print)
@@ -54,6 +69,8 @@ void print_token(token* to_print)
 
 token* next_token()
 {
+	nome_lido_tam = 0;
+
 	printf("TODO");
 	return NULL;
 }
