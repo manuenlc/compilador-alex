@@ -1,7 +1,6 @@
 /*
  * tokens.h
  *
- *  Created on: 23/10/2013
  *      Author: Emanuelle
  */
 
@@ -72,10 +71,3 @@ typedef struct token
 
 
 #endif /* TOKENS_H_ */
-
-
-/*
- * tokens.h
- *
- *      Author: Emanuelle
- */
