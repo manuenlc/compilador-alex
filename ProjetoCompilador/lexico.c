@@ -68,7 +68,7 @@ int get_and_check_token2(char* token_id)
 	token_id_no *no_atual = inicio_lista_token_id;
 	int token_id_posicao = 2;
 
-	while(no_atual->proximo && !strcmp(no_atual->proximo->valor_id, token_id))
+	while(no_atual->proximo && strcmp(no_atual->proximo->valor_id, token_id))
 	{
 		no_atual = no_atual->proximo;
 		++token_id_posicao;
@@ -91,7 +91,7 @@ int get_and_check_token2(char* token_id)
 		no_atual->proximo = NULL;
 	}
 
-	//senão, o elemento foi encontra -> retorna a posição dele
+	//senão, o elemento foi encontrado -> retorna a posição dele
 	return token_id_posicao;
 }
 
@@ -421,7 +421,7 @@ int main()
 	while(!acabou)
 	{
 		tk = next_token();
-		print_token(tk);
+		//print_token(tk);
 
 		if(tk->token1 == T_EOF) acabou = true;
 
