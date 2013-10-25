@@ -74,7 +74,7 @@ int get_and_check_token2(char* token_id)
 		++token_id_posicao;
 	}
 
-	if(!no_atual) //se no_atual for nulo -> adicionar na lista
+	if(!no_atual->proximo) //se no_atual for nulo -> adicionar na lista
 	{
 		no_atual->proximo = (token_id_no*) malloc(sizeof(token_id_no*));
 
@@ -115,8 +115,8 @@ token* fill_and_return_token(int token1)
 			strcpy(token_to_return->token_valor_id, "");
 			break;
 		case T_BOOLEAN_CONST:
-			if(strcmp("false", nome_lido)) token_to_return->token_valor_boolean = true;
-			else token_to_return->token_valor_boolean = false;
+			if(!strcmp("false", nome_lido)) token_to_return->token_valor_boolean = false;
+			else token_to_return->token_valor_boolean = true;
 			strcpy(token_to_return->token_valor_id, "");
 			break;
 		case T_REAL_CONST:

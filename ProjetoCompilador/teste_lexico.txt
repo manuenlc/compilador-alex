@@ -1,13 +1,1 @@
-20.1
-30.001
-true
-false
- program ;  . 
-const 
-=  ; var ;  ,	: 
-procedure  ; ( t ) := 
-if If IF iF then	else 
-while do 
-begin  end
-<  =  >  <=  <>  >= 
-+  -  or  *  div  mod  and  ( )  not
+a a b b c c
