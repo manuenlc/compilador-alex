@@ -1,0 +1,23 @@
+Joilson
+joilson
+Joilson2
+Joilson2
+(* comentario
+multilinha*)
+10     
+20
+30  { outro comentario }
+10.1
+20.1
+30.001
+true
+false
+ program ;  . 
+const 
+=  ; var ;  ,	: 
+procedure  ; ( t ) := 
+if If IF iF then	else 
+while do 
+begin  end
+<  =  >  <=  <>  >= 
++  -  or  *  div  mod  and  ( )  not

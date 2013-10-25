@@ -14,6 +14,7 @@
 #include "boolean.h"
 #include "lexico.h"
 
+/*
 int main()
 {
 	token* tk = (token*) malloc(sizeof(token*));
@@ -32,3 +33,5 @@ int main()
 
 	return 0;
 }
+
+*/
