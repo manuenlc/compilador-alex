@@ -14,24 +14,28 @@
 #include "boolean.h"
 #include "lexico.h"
 
-/*
 int main()
 {
-	token* tk = (token*) malloc(sizeof(token*));
-	if(!tk) {printf("erro ao alocar memoria"); return -1;}
+	FILE *file = fopen("C:\\Users\\Emanuelle\\workspace c++\\ProjetoCompilador\\teste_lexico_alex.txt", "r");
+	int acabou = false;
 
-	tk->token1 = T_BOOLEAN_CONST;
-	tk->token2 = 10;
-	tk->token_valor_int = 20;
-	tk->token_valor_real = 13.2;
-	tk->token_valor_boolean = false;
-	strcpy(tk->token_valor_id, "hello");
+	if(!file)
+	{
+		printf("erro ao abrir o arquivo");
+		return -1;
+	}
 
-	print_token(tk);
+	init_arquivo_fonte(file);
 
-	free(tk);
+	token tk;
+
+	while(!acabou)
+	{
+		tk = next_token();
+		print_token(tk);
+		if(tk.token1 == T_EOF) acabou = true;
+	}
+
 
 	return 0;
 }
-
-*/

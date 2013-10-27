@@ -28,7 +28,8 @@ int eh_comentario = false;
 void print_token(token to_print);
 void add_char_to_nome_lido(char c);
 char next_char();
-void init_arquivo_fonte(FILE *arquivo);
+void init_arquivo_fonte(FILE *arquivo_input);
+void close_arquivo_fonte();
 token fill_and_return_token(int token1);
 token token_reserved_word();
 token token_ponctuation(char c);
@@ -45,6 +46,18 @@ int get_and_check_token2(char* token_id);
 
 
 /*implementação das funções */
+
+void init_arquivo_fonte(FILE *arquivo_input)
+{
+	if(arquivo_input == NULL) printf("arquivo invalido!");
+	else arquivo_fonte = arquivo_input;
+}
+
+void close_arquivo_fonte()
+{
+	close(arquivo_fonte);
+	qtd_token_id = 0;
+}
 
 int get_and_check_token2(char* token_id)
 {
@@ -98,6 +111,7 @@ token fill_and_return_token(int token1)
 			break;
 		case T_EOF:
 			strcpy(token_to_return.token_valor_id, "");
+			close_arquivo_fonte();
 			break;
 		default:
 			strcpy(token_to_return.token_valor_id, "");
@@ -363,32 +377,4 @@ token next_token()
 	if(ispunct(c)) return token_ponctuation(c);
 
 	return fill_and_return_token(T_INVALID);
-}
-
-
-int main()
-{
-	FILE *file = fopen("C:\\Users\\Emanuelle\\workspace c++\\ProjetoCompilador\\teste_lexico_alex.txt", "r");
-	int acabou = false;
-
-	if(!file)
-	{
-		printf("erro ao abrir o arquivo");
-		return -1;
-	}
-
-	arquivo_fonte = file;
-
-	token tk;
-
-	while(!acabou)
-	{
-		tk = next_token();
-		print_token(tk);
-		if(tk.token1 == T_EOF) acabou = true;
-	}
-
-	fclose(arquivo_fonte);
-
-	return 0;
 }

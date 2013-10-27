@@ -26,5 +26,8 @@ token next_token();
 /** imprime as informações do token no console*/
 void print_token(token to_print);
 
+/** inicializa o arquivo que será lio por next_token()*/
+void init_arquivo_fonte(FILE *arquivo_input);
+
 
 #endif /* LEXICO_H_ */
