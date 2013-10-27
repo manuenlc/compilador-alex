@@ -18,23 +18,24 @@
 /* variaveis globais */
 int nome_lido_tam;
 char nome_lido[ID_TAM_MAX];
-static token_id_no *inicio_lista_token_id;
+static token_id_info array_tokens_id[ID_QTD_MAX];
+int qtd_token_id = 0;
 static FILE *arquivo_fonte = NULL;
 int eh_comentario = false;
 
 
 /* funções */
-void print_token(token* to_print);
+void print_token(token to_print);
 void add_char_to_nome_lido(char c);
 char next_char();
 void init_arquivo_fonte(FILE *arquivo);
-token* fill_and_return_token(int token1);
-token* token_reserved_word();
-token* token_ponctuation(char c);
-token* token_id_or_reserved_word(char c);
+token fill_and_return_token(int token1);
+token token_reserved_word();
+token token_ponctuation(char c);
+token token_id_or_reserved_word(char c);
 /* quando entrar em uma região de comentário, esse método retornará o próximo token depois do comentário*/
-token* jump_comments(char c);
-token* token_int_real_or_invalid(char c);
+token jump_comments(char c);
+token token_int_real_or_invalid(char c);
 /* volta uma posição na posição atual do arquivo arquivo_fonte*/
 void go_back_the_char_read();
 /*se não existir: colocar o id na lista e retorna o novo token2
@@ -47,97 +48,65 @@ int get_and_check_token2(char* token_id);
 
 int get_and_check_token2(char* token_id)
 {
-	if(!inicio_lista_token_id) //lista vazia
-	{
-		inicio_lista_token_id = (token_id_no*) malloc(sizeof(token_id_no*));
 
-		if(!inicio_lista_token_id)
-		{
-			printf("erro ao alocar memoria");
-			return -1;
-		}
+	int token_id_posicao = 0;
 
-		inicio_lista_token_id->token2 = 1;
-		strcpy(inicio_lista_token_id->valor_id, token_id);
-		inicio_lista_token_id->proximo = NULL;
-		return 1;
-	}
-
-	if(!strcmp(inicio_lista_token_id->valor_id, token_id)) return 1; // é o primeiro da lista
-
-	token_id_no *no_atual = inicio_lista_token_id;
-	int token_id_posicao = 2;
-
-	while(no_atual->proximo && strcmp(no_atual->proximo->valor_id, token_id))
-	{
-		no_atual = no_atual->proximo;
+	while(token_id_posicao < qtd_token_id
+			&& !strcmp(array_tokens_id[token_id_posicao].valor_id, token_id))
 		++token_id_posicao;
-	}
 
-	if(!no_atual->proximo) //se no_atual for nulo -> adicionar na lista
+	if(token_id_posicao == qtd_token_id) //não encontrou o token -> adiciona no array
 	{
-		no_atual->proximo = (token_id_no*) malloc(sizeof(token_id_no*));
-
-		if(!no_atual->proximo)
+		if(qtd_token_id < ID_QTD_MAX)
 		{
-			printf("erro ao alocar memoria");
-			return -1;
+			++qtd_token_id;
+			array_tokens_id[qtd_token_id].token2 = qtd_token_id;
+			strcpy(array_tokens_id[qtd_token_id].valor_id, token_id);
+			return qtd_token_id;
 		}
-
-		no_atual = no_atual->proximo;
-
-		no_atual->token2 = token_id_posicao;
-		strcpy(no_atual->valor_id, token_id);
-		no_atual->proximo = NULL;
 	}
 
-	//senão, o elemento foi encontrado -> retorna a posição dele
-	return token_id_posicao;
+	return array_tokens_id[token_id_posicao].token2; //senão, o elemento foi encontrado -> retorna a posição dele
 }
 
-token* fill_and_return_token(int token1)
+token fill_and_return_token(int token1)
 {
 	nome_lido[nome_lido_tam++] = '\0';
 
-	token* token_to_return = (token*) malloc(sizeof(token*));
-	if(!token_to_return)
-	{
-		printf("erro ao alocar memória");
-		return NULL;
-	}
+	token token_to_return;
 
-	token_to_return->token1 = token1;
+	token_to_return.token1 = token1;
 
 	switch (token1)
 	{
 		case T_INT_CONST:
-			token_to_return->token_valor_int = atoi(nome_lido);
-			strcpy(token_to_return->token_valor_id, "");
+			token_to_return.token_valor_int = atoi(nome_lido);
+			strcpy(token_to_return.token_valor_id, "");
 			break;
 		case T_BOOLEAN_CONST:
-			if(!strcmp("false", nome_lido)) token_to_return->token_valor_boolean = false;
-			else token_to_return->token_valor_boolean = true;
-			strcpy(token_to_return->token_valor_id, "");
+			if(!strcmp("false", nome_lido)) token_to_return.token_valor_boolean = false;
+			else token_to_return.token_valor_boolean = true;
+			strcpy(token_to_return.token_valor_id, "");
 			break;
 		case T_REAL_CONST:
-			token_to_return->token_valor_real = (float) atof(nome_lido);
-			strcpy(token_to_return->token_valor_id, "");
+			token_to_return.token_valor_real = (float) atof(nome_lido);
+			strcpy(token_to_return.token_valor_id, "");
 			break;
 		case T_ID:
-			strcpy(token_to_return->token_valor_id, nome_lido);
-			token_to_return->token2 = get_and_check_token2(token_to_return->token_valor_id);
+			strcpy(token_to_return.token_valor_id, nome_lido);
+			token_to_return.token2 = get_and_check_token2(token_to_return.token_valor_id);
 			break;
 		case T_EOF:
-			strcpy(token_to_return->token_valor_id, "");
+			strcpy(token_to_return.token_valor_id, "");
 			break;
 		default:
-			strcpy(token_to_return->token_valor_id, "");
+			strcpy(token_to_return.token_valor_id, "");
 			break;
 	}
 	return token_to_return;
 }
 
-token* jump_comments(char c)
+token jump_comments(char c)
 {
 	while(eh_comentario)
 	{
@@ -174,41 +143,35 @@ void add_char_to_nome_lido(char c)
 	}
 }
 
-void print_token(token* to_print)
+void print_token(token to_print)
 {
-	if(to_print == NULL)
-	{
-		printf("token NULL");
-		return;
-	}
+	printf("%d\t\t", to_print.token1);
 
-	printf("%d\t\t", to_print->token1);
-
-	switch (to_print->token1)
+	switch (to_print.token1)
 	{
 		case T_INT_CONST:
-			printf(" \t\t%d", to_print->token_valor_int);
+			printf(" \t\t%d", to_print.token_valor_int);
 			break;
 		case T_BOOLEAN_CONST:
-			if(to_print->token_valor_boolean) printf(" \t\ttrue");
+			if(to_print.token_valor_boolean) printf(" \t\ttrue");
 			else printf(" \t\tfalse");
 			break;
 		case T_REAL_CONST:
-			printf(" \t\t%f", to_print->token_valor_real);
+			printf(" \t\t%f", to_print.token_valor_real);
 			break;
 		case T_ID:
-			printf("%d\t\t", to_print->token2);
-			printf("%s", to_print->token_valor_id);
+			printf("%d\t\t", to_print.token2);
+			printf("%s", to_print.token_valor_id);
 			break;
 		default:
-			printf("%s", to_print->token_valor_id);
+			printf("%s", to_print.token_valor_id);
 			break;
 	}
 
 		printf("\n");
 }
 
-token* token_reserved_word()
+token token_reserved_word()
 {
 	nome_lido[nome_lido_tam++] = '\0';
 
@@ -238,7 +201,7 @@ token* token_reserved_word()
 	else return fill_and_return_token(T_ID);
 }
 
-token* token_ponctuation(char c)
+token token_ponctuation(char c)
 {
 	switch(c)
 	{
@@ -296,7 +259,7 @@ token* token_ponctuation(char c)
 
 }
 
-token* token_int_real_or_invalid(char c)
+token token_int_real_or_invalid(char c)
 {
 	while(isdigit(c))
 	{
@@ -342,7 +305,7 @@ token* token_int_real_or_invalid(char c)
 	return fill_and_return_token(T_INVALID);
 }
 
-token* token_id_or_reserved_word(char c)
+token token_id_or_reserved_word(char c)
 {
 	add_char_to_nome_lido(c);
 	c = next_char();
@@ -382,7 +345,7 @@ char next_char()
 	return tolower(fgetc(arquivo_fonte));
 }
 
-token* next_token()
+token next_token()
 {
 	nome_lido_tam = 0;
 	char c = next_char();
@@ -405,7 +368,7 @@ token* next_token()
 
 int main()
 {
-	FILE *file = fopen("C:\\Users\\Emanuelle\\workspace c++\\ProjetoCompilador\\teste_lexico.txt", "r");
+	FILE *file = fopen("C:\\Users\\Emanuelle\\workspace c++\\ProjetoCompilador\\teste_lexico_alex.txt", "r");
 	int acabou = false;
 
 	if(!file)
@@ -416,16 +379,13 @@ int main()
 
 	arquivo_fonte = file;
 
-	token *tk;
+	token tk;
 
 	while(!acabou)
 	{
 		tk = next_token();
-		//print_token(tk);
-
-		if(tk->token1 == T_EOF) acabou = true;
-
-		//if(tk->token1 != T_ID) free(tk);
+		print_token(tk);
+		if(tk.token1 == T_EOF) acabou = true;
 	}
 
 	fclose(arquivo_fonte);

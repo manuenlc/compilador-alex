@@ -58,6 +58,7 @@
 #define T_INVALID             255
 
 #define ID_TAM_MAX 				64
+#define ID_QTD_MAX 				100
 
 typedef struct token
 {

@@ -11,27 +11,20 @@
 # include "boolean.h"
 
 
-typedef struct token_no
-{
-	token *token_atual;
-	struct token_no *proximo_token;
-} token_no;
-
-typedef struct token_id_no
+typedef struct token_id_info
 {
 	int token2;
 	char valor_id[ID_TAM_MAX];
-	struct token_id_no *proximo;
-} token_id_no;
+} token_id_info;
 
 
 /** funções */
 
 /** retorna o token lido */
-token* next_token();
+token next_token();
 
 /** imprime as informações do token no console*/
-void print_token(token* to_print);
+void print_token(token to_print);
 
 
 #endif /* LEXICO_H_ */
