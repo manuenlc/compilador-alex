@@ -52,16 +52,16 @@ int get_and_check_token2(char* token_id)
 	int token_id_posicao = 0;
 
 	while(token_id_posicao < qtd_token_id
-			&& !strcmp(array_tokens_id[token_id_posicao].valor_id, token_id))
+			&& strcmp(array_tokens_id[token_id_posicao].valor_id, token_id))
 		++token_id_posicao;
 
-	if(token_id_posicao == qtd_token_id) //não encontrou o token -> adiciona no array
+	if(token_id_posicao >= qtd_token_id) //não encontrou o token -> adiciona no array
 	{
 		if(qtd_token_id < ID_QTD_MAX)
 		{
 			++qtd_token_id;
-			array_tokens_id[qtd_token_id].token2 = qtd_token_id;
-			strcpy(array_tokens_id[qtd_token_id].valor_id, token_id);
+			array_tokens_id[token_id_posicao].token2 = qtd_token_id;
+			strcpy(array_tokens_id[token_id_posicao].valor_id, token_id);
 			return qtd_token_id;
 		}
 	}
