@@ -13,6 +13,7 @@
 #include "tokens.h"
 #include "boolean.h"
 #include "lexico.h"
+#include "gramatica.tab.h"
 
 
 /* variaveis globais */
@@ -23,6 +24,9 @@ int qtd_token_id = 0;
 static FILE *arquivo_fonte = NULL;
 int eh_comentario = false;
 
+/* variáveis externas globais - bison */
+YYSTYPE yyval;
+int yytype;
 
 /* funções */
 void print_token(token to_print);
@@ -55,7 +59,7 @@ void init_arquivo_fonte(FILE *arquivo_input)
 
 void close_arquivo_fonte()
 {
-	close(arquivo_fonte);
+	fclose(arquivo_fonte);
 	qtd_token_id = 0;
 }
 
@@ -228,7 +232,11 @@ token token_ponctuation(char c)
 	case ',': return fill_and_return_token(T_COMMA);
 	case '(':
 		c = next_char();
-		if(c != '*') return fill_and_return_token(T_LBRACKET); //voltar 1
+		if(c != '*')
+		{
+			if(c != EOF) go_back_the_char_read();
+			return fill_and_return_token(T_LBRACKET);
+		}
 		/* no break */
 	case '{':
 		eh_comentario = true;
@@ -240,7 +248,7 @@ token token_ponctuation(char c)
 		else if(c == '>') return fill_and_return_token(T_DIF);
 		else
 		{
-			go_back_the_char_read();
+			if(c != EOF) go_back_the_char_read();
 			return fill_and_return_token(T_LT);
 		}
 	case '>':
@@ -248,7 +256,7 @@ token token_ponctuation(char c)
 		if(c == '=') return fill_and_return_token(T_GEQ);
 		else
 		{
-			go_back_the_char_read();
+			if(c != EOF) go_back_the_char_read();
 			return fill_and_return_token(T_GT);
 		}
 	case ':':
@@ -256,7 +264,7 @@ token token_ponctuation(char c)
 		if(c == '=') return fill_and_return_token(T_ASSIGN);
 		else
 		{
-			go_back_the_char_read();
+			if(c != EOF) go_back_the_char_read();
 			return fill_and_return_token(T_COLON);
 		}
 	case '.':
@@ -264,7 +272,7 @@ token token_ponctuation(char c)
 		if(c == '.') return fill_and_return_token(T_DOUBLE_PERIOD);
 		else
 		{
-			go_back_the_char_read();
+			if(c != EOF) go_back_the_char_read();
 			return fill_and_return_token(T_PERIOD);
 		}
 	default :
@@ -338,10 +346,12 @@ token token_id_or_reserved_word(char c)
 			c = next_char();
 		}
 
+		go_back_the_char_read();
 		return fill_and_return_token(T_ID);
 	}
 	else
 	{
+		go_back_the_char_read();
 		return token_reserved_word();
 	}
 
@@ -356,7 +366,9 @@ void go_back_the_char_read()
 
 char next_char()
 {
-	return tolower(fgetc(arquivo_fonte));
+	char c = tolower(fgetc(arquivo_fonte));
+	//printf("%c\n", c);
+	return c;
 }
 
 token next_token()
@@ -377,4 +389,41 @@ token next_token()
 	if(ispunct(c)) return token_ponctuation(c);
 
 	return fill_and_return_token(T_INVALID);
+}
+
+int yyerror(char* error_description)
+{
+	printf("erro ao compilar:\n");
+	printf("%s\n", error_description);
+	return 0;
+}
+
+int yylex(void)
+{
+	token token_lido = next_token();
+
+	printf("next token chamado! %d\n", token_lido.token1);
+
+	yylval.token1 = token_lido.token1;
+
+	switch(token_lido.token1)
+	{
+	case T_ID :
+		yyval.token2 = token_lido.token2;
+		strcpy(yyval.token_valor_id, token_lido.token_valor_id);
+		break;
+	case T_INT_CONST:
+		yyval.token_valor_int = token_lido.token_valor_int;
+		break;
+	case T_REAL_CONST:
+		yyval.token_valor_real = token_lido.token_valor_real;
+		break;
+	case T_BOOLEAN_CONST:
+		yyval.token_valor_boolean = token_lido.token_valor_boolean;
+		break;
+	default:
+		break;
+	}
+
+	return token_lido.token1;
 }

@@ -7,6 +7,7 @@
 #ifndef TOKENS_H_
 #define TOKENS_H_
 
+/*
 #define T_EOF                  0
 #define T_ID                   1
 #define T_INT_CONST            2
@@ -56,6 +57,7 @@
 #define T_GT                   46
 #define T_GEQ                  47
 #define T_INVALID             255
+*/
 
 #define ID_TAM_MAX 				64
 #define ID_QTD_MAX 				100

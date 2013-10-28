@@ -7,6 +7,8 @@
 #ifndef LEXICO_H_
 #define LEXICO_H_
 
+#include <stdio.h>
+
 # include "tokens.h"
 # include "boolean.h"
 
@@ -28,6 +30,10 @@ void print_token(token to_print);
 
 /** inicializa o arquivo que será lio por next_token()*/
 void init_arquivo_fonte(FILE *arquivo_input);
+
+/** funções geradas pelo bison */
+int yylex(void);
+int yyerror(char* error_description);
 
 
 #endif /* LEXICO_H_ */
