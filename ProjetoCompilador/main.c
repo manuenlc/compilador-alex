@@ -30,6 +30,8 @@ int main()
 
 	init_arquivo_fonte(file);
 
+
+/*
 	int acabou = false;
 
 	token tk;
@@ -42,9 +44,9 @@ int main()
 		if(tk.token1 == T_EOF) acabou = true;
 	}
 
-	/*if(!yyparse()) puts("compilado!");
+*/
+	if(!yyparse()) puts("compilado!");
 	else puts("compilacao falhou!");
-	*/
 
 
 	return 0;

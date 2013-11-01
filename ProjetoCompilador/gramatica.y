@@ -71,116 +71,181 @@ extern int yyerror(char*);
 %right T_THEN T_ELSE
 
 %%
-input: T_PROGRAM T_ID T_SEMICOLON block_body T_PERIOD
+input: T_PROGRAM T_ID T_SEMICOLON force_initialization block_body T_PERIOD
 ;
-block_body: 
-	constant_definition_part 
-	variable_definition_part opt_procedure_definition 
-	compound_statement
+
+force_initialization: 
 ;
-constant_definition_part: 
-	| T_CONST constant_definition opt_constant_definition
+
+block_body: opt_constant_definition_part opt_variable_definition_part star_procedure_definition compound_statement
 ;
-constant_definition: T_ID T_EQ constant T_SEMICOLON
+
+opt_constant_definition_part: 
+                            | constant_definition_part
 ;
-variable_definition_part: 
-	| T_VAR variable_definition opt_variable_definition
+
+opt_variable_definition_part: 
+                            | variable_definition_part  
 ;
+
+star_procedure_definition: 
+                         | procedure_definition star_procedure_definition
+;
+
+constant_definition_part: T_CONST plus_constant_definition
+;
+
+plus_constant_definition: constant_definition 
+                        | constant_definition plus_constant_definition
+;
+
+constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON 
+                   | T_ID T_EQ T_REAL_CONST T_SEMICOLON 
+                   | T_ID T_EQ T_BOOLEAN_CONST T_SEMICOLON 
+;
+
+variable_definition_part: T_VAR plus_variable_definition
+;
+
+plus_variable_definition: variable_definition 
+                        | variable_definition plus_variable_definition
+;
+
 variable_definition: variable_group T_SEMICOLON
 ;
-variable_group:	
-	T_ID opt_id T_COLON type
+
+variable_group: T_ID star_comma_id T_COLON type
 ;
-type: T_INTEGER | T_BOOLEAN | T_REAL 
+
+star_comma_id: 
+             | T_COMMA T_ID star_comma_id
 ;
-procedure_definition: 	
-	T_PROCEDURE T_ID procedure_block T_SEMICOLON
+
+type: T_INTEGER 
+    | T_REAL 
+    | T_BOOLEAN 
 ;
-procedure_block: T_SEMICOLON block_body
-	| T_LBRACKET formal_parameter_list T_RBRACKET T_SEMICOLON block_body
+
+procedure_definition: procedure_block block_body T_SEMICOLON 
 ;
-formal_parameter_list:
-	parameter_definition opt_parameter_definition
+
+procedure_block: T_PROCEDURE T_ID opt_brc_formal_parameter_list_brc T_SEMICOLON 
 ;
+
+opt_brc_formal_parameter_list_brc: 
+                                 | T_LBRACKET formal_parameter_list T_RBRACKET
+;
+
+formal_parameter_list: parameter_definition star_smc_parameter_definition
+;
+
+star_smc_parameter_definition:
+                             | T_SEMICOLON parameter_definition star_smc_parameter_definition
+;
+
 parameter_definition: variable_group
 ;
+
 statement: 
-	assignment_statement | procedure_statement |
-	if_statement | while_statement |
-    compound_statement |
+         | procedure_statement
+         | if_statement
+         | while_statement
+         | compound_statement
+         | assignment_statement
 ;
-assignment_statement: 
-	variable_access T_ASSIGN expression
+
+assignment_statement: variable_access T_ASSIGN expression
 ;
-procedure_statement: 
-	T_ID | T_ID T_LBRACKET actual_parameter_list T_RBRACKET
+
+procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 ;
-actual_parameter_list: 
-	actual_parameter opt_actual_parameter
+
+opt_brc_actual_parameter_list_brc:
+                                 | T_LBRACKET actual_parameter_list T_RBRACKET
 ;
+
+actual_parameter_list: actual_parameter star_comma_actual_parameter
+;
+
+star_comma_actual_parameter: 
+                          | T_COMMA actual_parameter star_comma_actual_parameter
+;
+
 actual_parameter: expression
 ;
-if_statement: 
-	T_IF expression T_THEN statement
-	| T_IF expression T_THEN statement T_ELSE statement
+
+if_statement: T_IF expression T_THEN statement
+            | T_IF expression T_THEN statement T_ELSE statement
 ;
-while_statement: 
-	T_WHILE expression T_DO statement
+
+while_statement: T_WHILE expression T_DO statement
 ;
-compound_statement: 
-	T_BEGIN statement opt_statement T_END
+
+
+compound_statement: T_BEGIN statement star_comma_statement T_END
 ;
-expression: simple_expression 
-	| simple_expression relational_operator simple_expression
+
+star_comma_statement: 
+                    | T_SEMICOLON statement star_comma_statement
 ;
-relational_operator: 
-	T_LT | T_EQ | T_GT | T_LEQ | T_DIF | T_GEQ
+
+expression: simple_expression opt_relational_operator_simple_expression
 ;
-simple_expression: term opt_adding_operator
-	| sign_operator term opt_adding_operator
+
+opt_relational_operator_simple_expression: 
+                                         | relational_operator simple_expression
 ;
-sign_operator: T_PLUS | T_MINUS
+
+relational_operator: T_LT  
+                   | T_EQ  
+                   | T_GT 
+                   | T_LEQ 
+                   | T_DIF 
+                   | T_GEQ 
 ;
-adding_operator: T_PLUS | T_MINUS | T_OR
+
+simple_expression: sign_operator term star_adding_operator_term
+                 | term star_adding_operator_term
 ;
-term: factor opt_multiplying_operator
+
+sign_operator: T_PLUS
+             | T_MINUS
 ;
-multiplying_operator: T_TIMES | T_DIV | T_MOD | T_AND
+
+star_adding_operator_term:
+                         | adding_operator term star_adding_operator_term
 ;
-factor: constant_use | variable_access | 
-	T_LBRACKET expression T_RBRACKET | T_NOT factor
+
+adding_operator: T_PLUS
+               | T_MINUS
+               | T_OR
 ;
+
+term: factor star_multiplying_operator_factor
+;
+
+star_multiplying_operator_factor:
+                                | multiplying_operator factor star_multiplying_operator_factor
+;
+
+multiplying_operator: T_TIMES  
+                    | T_DIV   
+                    | T_MOD    
+                    | T_AND   
+                    | T_DIVIDE
+;
+
+factor: constant
+      | T_LBRACKET expression T_RBRACKET
+      | T_NOT factor
+;
+
 variable_access: T_ID
 ;
-constant: T_INT_CONST | T_REAL_CONST | T_BOOLEAN_CONST | T_ID
-;
-constant_use: T_INT_CONST | T_REAL_CONST | T_BOOLEAN_CONST
-;
-opt_procedure_definition: 
-	| procedure_definition opt_procedure_definition
-;
-opt_constant_definition:
-	| constant_definition opt_constant_definition
-;
-opt_variable_definition:
-	| variable_definition opt_variable_definition
-;
-opt_id:
-	| T_COMMA T_ID opt_id
-;
-opt_actual_parameter:
-	| T_COMMA actual_parameter opt_actual_parameter
-;
-opt_statement:
-	| T_SEMICOLON statement opt_statement
-;
-opt_adding_operator:
-	| adding_operator opt_adding_operator
-;
-opt_parameter_definition:
-	| T_SEMICOLON parameter_definition opt_parameter_definition
-;
-opt_multiplying_operator:
-	| multiplying_operator opt_multiplying_operator
+
+constant: T_INT_CONST
+        | T_REAL_CONST
+        | T_BOOLEAN_CONST
+        | variable_access
 ;
 %%

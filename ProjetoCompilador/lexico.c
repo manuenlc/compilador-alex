@@ -23,6 +23,7 @@ static token_id_info array_tokens_id[ID_QTD_MAX];
 int qtd_token_id = 0;
 static FILE *arquivo_fonte = NULL;
 int eh_comentario = false;
+int linhas_lidas = 1;
 
 /* variáveis externas globais - bison */
 YYSTYPE yyval;
@@ -61,6 +62,7 @@ void close_arquivo_fonte()
 {
 	fclose(arquivo_fonte);
 	qtd_token_id = 0;
+	linhas_lidas = 1;
 }
 
 int get_and_check_token2(char* token_id)
@@ -367,7 +369,7 @@ void go_back_the_char_read()
 char next_char()
 {
 	char c = tolower(fgetc(arquivo_fonte));
-	//printf("%c\n", c);
+	if(c == '\n') ++linhas_lidas;
 	return c;
 }
 
@@ -393,7 +395,7 @@ token next_token()
 
 int yyerror(char* error_description)
 {
-	printf("erro ao compilar:\n");
+	printf("erro na linha %d: ", linhas_lidas);
 	printf("%s\n", error_description);
 	return 0;
 }
