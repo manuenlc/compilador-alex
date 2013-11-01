@@ -23,7 +23,7 @@ typedef struct simbolo
 	int token2;
 
 	int quantidade_parametros; //para procedures
-	simbolo parametros[QTD_MAX_PARAMETROS];
+	int parametros[QTD_MAX_PARAMETROS]; //token 1 do tipo de parametro
 
 } simbolo;
 
