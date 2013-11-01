@@ -18,7 +18,7 @@
 
 extern int yyparse(void);
 
-int main()
+/*int main()
 {
 	FILE *file = fopen("C:\\Users\\Emanuelle\\workspace c++\\ProjetoCompilador\\teste_sintatico.txt", "r");
 
@@ -49,6 +49,7 @@ int main()
 	if(!yyparse()) puts("compilado!");
 	else puts("compilacao falhou!");
 */
-
+/*
 	return 0;
 }
+*/

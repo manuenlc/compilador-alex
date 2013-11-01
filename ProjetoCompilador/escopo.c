@@ -18,8 +18,8 @@ int largura_escopo[LARGURA_ESCOPO_MAX];
 /* Declaração de funções*/
 void begin_block();
 void end_block();
-bool seach_symbol_on_current_scope(simbolo simbolo_procurado);
-bool seach_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado);
+bool search_token2_on_current_scope(int token2);
+bool search_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado);
 bool insert_var(int token1, int token2);
 bool insert_parameter(int token1, int token2);
 bool insert_procedure(int token2, int quantidade_parametros, int tipo_retorno, simbolo parametros[QTD_MAX_PARAMETROS] );
@@ -70,18 +70,18 @@ bool is_equal(simbolo simbolo_procurado, int altura_escopo, int largura_escopo)
 }
 
 
-bool seach_symbol_on_current_scope(simbolo simbolo_procurado)
+bool search_token2_on_current_scope(int token2)
 {
 	int i;
 	for(i = 0; i < largura_escopo[altura_escopo]; ++i)
 	{
-		if(is_equal(simbolo_procurado, altura_escopo, i)) return true;
+		if(escopo[altura_escopo][i].token2 == token2) return true;
 	}
 
 	return false;
 }
 
-bool seach_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado)
+bool search_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado)
 {
 	int i, j;
 
@@ -132,7 +132,7 @@ bool insert_var(int token1, int token2)
 	procurado.token2 = token2;
 	procurado.quantidade_parametros = 0;
 
-	bool achou = seach_symbol_on_current_scope(procurado);
+	bool achou = search_token2_on_current_scope(token2);
 
 	if(achou) return false; //o simbolo ja esta na tabela
 	else return insert_symbol(procurado);
@@ -147,7 +147,7 @@ bool insert_parameter(int token1, int token2)
 	procurado.token2 = token2;
 	procurado.quantidade_parametros = 0;
 
-	bool achou = seach_symbol_on_current_scope(procurado);
+	bool achou = search_token2_on_current_scope(token2);
 
 	if(achou) return false; //o simbolo ja esta na tabela
 	else return insert_symbol(procurado);
@@ -162,7 +162,7 @@ bool insert_procedure(int token2, int quantidade_parametros,int tipo_retorno, si
 	procurado.quantidade_parametros = quantidade_parametros;
 	procurado.tipo_retorno = tipo_retorno;
 
-	bool achou = seach_symbol_on_current_scope(procurado);
+	bool achou = search_token2_on_current_scope(token2);
 
 	if(achou) return false; //o simbolo ja esta na tabela
 	else return insert_symbol(procurado);
@@ -176,9 +176,61 @@ bool insert_const(int token1, int token2)
 	procurado.token2 = token2;
 	procurado.quantidade_parametros = 0;
 
-	bool achou = seach_symbol_on_current_scope(procurado);
+	bool achou = search_token2_on_current_scope(token2);
 
 	if(achou) return false; //o simbolo ja esta na tabela
 	else return insert_symbol(procurado);
 
+}
+
+void print_current_scope()
+{
+	int i, j;
+
+	for(i = altura_escopo; i >= 0 ; --i)
+	{
+		for(j = 0; j < largura_escopo[altura_escopo]; ++j)
+		{
+			simbolo simbolo_atual = escopo[i][j];
+
+			switch (simbolo_atual.tipo_simbolo)
+			{
+				case T_PROCEDURE:
+					printf("tipo: %d token1: %d token2: %d qtdpar: %d retorno: %d",
+												simbolo_atual.tipo_simbolo, simbolo_atual.token1,
+												simbolo_atual.token2, simbolo_atual.quantidade_parametros,
+												simbolo_atual.tipo_retorno);
+				break;
+			default:
+				//case T_VAR:
+				//case T_PARAMETER:
+				//case T_CONST:
+					printf("tipo: %d token1: %d token2: %d qtdpar: %d",
+							simbolo_atual.tipo_simbolo, simbolo_atual.token1,
+							simbolo_atual.token2, simbolo_atual.quantidade_parametros);
+			}
+			printf(" -> ");
+		}
+		printf("\n");
+	}
+
+}
+
+int main()
+{
+	begin_block();
+
+	insert_const(T_INT_CONST, 1);
+	print_current_scope();
+	insert_var(T_INTEGER, 2);
+	print_current_scope();
+	insert_parameter(T_BOOLEAN, 3);
+	print_current_scope();
+	insert_procedure(4, 0, T_REAL, NULL);
+	print_current_scope();
+	insert_const(T_INT_CONST, 4);
+	print_current_scope();
+
+
+	return 0;
 }
