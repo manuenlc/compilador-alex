@@ -13,7 +13,7 @@ extern int yyerror(char*);
     int token1;
 	int token2;
     int token_valor_int;
-	char token_valor_id[ID_TAM_MAX];
+	char token_valor_id[64];
     float token_valor_real;
     int token_valor_boolean;
 }

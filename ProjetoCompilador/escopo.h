@@ -23,6 +23,7 @@ typedef struct simbolo
 	int token2;
 
 	int quantidade_parametros; //para procedures
+	int tipo_retorno; //para procedures
 	int parametros[QTD_MAX_PARAMETROS]; //token 1 do tipo de parametro
 
 } simbolo;
@@ -40,7 +41,7 @@ bool seach_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado);
  * */
 bool insert_var(int token1, int token2);
 bool insert_parameter(int token1, int token2);
-bool insert_procedure(int token2, int quantidade_parametros, simbolo parametros[QTD_MAX_PARAMETROS] );
+bool insert_procedure(int token2, int quantidade_parametros, int tipo_retorno, simbolo parametros[QTD_MAX_PARAMETROS] );
 bool insert_const(int token1, int token2);
 
 #endif /* ESCOPO_H_ */

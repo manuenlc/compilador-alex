@@ -45,9 +45,10 @@ int main()
 	}
 
 */
+/*
 	if(!yyparse()) puts("compilado!");
 	else puts("compilacao falhou!");
-
+*/
 
 	return 0;
 }
