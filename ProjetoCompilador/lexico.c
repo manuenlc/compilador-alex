@@ -431,13 +431,10 @@ int yylex(void)
 
 	printf("%d ", token_lido.token1);
 
-	yylval.token1 = token_lido.token1;
-
 	switch(token_lido.token1)
 	{
 	case T_ID :
 		yyval.token2 = token_lido.token2; printf("( token 2 eh: %d ) ", token_lido.token2);
-		strcpy(yyval.token_valor_id, token_lido.token_valor_id);
 		break;
 	case T_INT_CONST:
 		yyval.token_valor_int = token_lido.token_valor_int;
@@ -449,6 +446,7 @@ int yylex(void)
 		yyval.token_valor_boolean = token_lido.token_valor_boolean;
 		break;
 	default:
+		yylval.token1 = token_lido.token1;
 		break;
 	}
 
