@@ -87,6 +87,8 @@
      T_LEQ = 45,
      T_GT = 46,
      T_GEQ = 47,
+     T_PARAMETER = 48,
+     T_VOID = 49,
      T_INVALID = 255
    };
 #endif
@@ -98,7 +100,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 12 "gramatica.y"
+#line 17 "gramatica.y"
 
     int token1;
 	int token2;
@@ -110,7 +112,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 114 "gramatica.tab.h"
+#line 116 "gramatica.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

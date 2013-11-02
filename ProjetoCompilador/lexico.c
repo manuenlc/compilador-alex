@@ -13,7 +13,6 @@
 #include "tokens.h"
 #include "boolean.h"
 #include "lexico.h"
-#include "gramatica.tab.h"
 
 
 /* variaveis globais */
@@ -49,11 +48,16 @@ void go_back_the_char_read();
  * retorna -1 se deu erro de memória*/
 int get_and_check_token2(char* token_id);
 
+int get_line();
+char *get_token2_id(int token2);
+
 
 /*implementação das funções */
 
 void init_arquivo_fonte(FILE *arquivo_input)
 {
+	linhas_lidas = 1;
+
 	if(arquivo_input == NULL) printf("arquivo invalido!");
 	else arquivo_fonte = arquivo_input;
 }
@@ -63,6 +67,27 @@ void close_arquivo_fonte()
 	fclose(arquivo_fonte);
 	qtd_token_id = 0;
 	linhas_lidas = 1;
+}
+
+int get_line()
+{
+	return linhas_lidas;
+}
+
+char *get_token2_id(int token2)
+{
+	int token_id_posicao = 0;
+
+	while(token_id_posicao < qtd_token_id
+				&& array_tokens_id[token_id_posicao].token2 != token2)
+			++token_id_posicao;
+
+	if(token_id_posicao == qtd_token_id)
+	{
+		printf("token2 %d inexistente\n", token2);
+		return NULL;
+	}
+	else return array_tokens_id[token_id_posicao].valor_id;
 }
 
 int get_and_check_token2(char* token_id)
@@ -369,7 +394,7 @@ void go_back_the_char_read()
 char next_char()
 {
 	char c = tolower(fgetc(arquivo_fonte));
-	if(c == '\n') ++linhas_lidas;
+	if(c == '\n') {c = tolower(fgetc(arquivo_fonte)); ++linhas_lidas; printf("\nlinha: %d\n", linhas_lidas);}
 	return c;
 }
 
@@ -404,14 +429,14 @@ int yylex(void)
 {
 	token token_lido = next_token();
 
-	printf("next token chamado! %d\n", token_lido.token1);
+	printf("%d ", token_lido.token1);
 
 	yylval.token1 = token_lido.token1;
 
 	switch(token_lido.token1)
 	{
 	case T_ID :
-		yyval.token2 = token_lido.token2;
+		yyval.token2 = token_lido.token2; printf("( token 2 eh: %d ) ", token_lido.token2);
 		strcpy(yyval.token_valor_id, token_lido.token_valor_id);
 		break;
 	case T_INT_CONST:

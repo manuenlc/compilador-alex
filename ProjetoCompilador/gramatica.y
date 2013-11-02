@@ -2,9 +2,14 @@
 
 #include "lexico.h"
 #include "tokens.h"
+#include "escopo.h"
+#include "gramatica.tab.h"
 
 extern int yylex(void);
 extern int yyerror(char*);
+
+int quantidade_arg = 0;
+int *tipo_arg = NULL;
 
 %}
 
@@ -66,21 +71,39 @@ extern int yyerror(char*);
 %token T_LEQ                  45
 %token T_GT                   46
 %token T_GEQ                  47
+%token T_PARAMETER			48
+%token T_VOID				49
 %token T_INVALID             255
+
+
 
 %right T_THEN T_ELSE
 
+
+
+%type<token_valor_real> T_REAL_CONST
+%type<token_valor_int> T_INT_CONST
+%type<token_valor_boolean> T_BOOLEAN_CONST
+%type<token2> T_ID
+
+
 %%
-input: T_PROGRAM T_ID T_SEMICOLON force_initialization block_body T_PERIOD
+input: T_PROGRAM T_ID T_SEMICOLON new_block block_body T_PERIOD
+{
+	end_block();
+}
 ;
 
-force_initialization: 
+new_block: 
+{
+	begin_block();
+}
 ;
 
 block_body: opt_constant_definition_part opt_variable_definition_part star_procedure_definition compound_statement
 ;
 
-opt_constant_definition_part: 
+opt_constant_definition_part:
                             | constant_definition_part
 ;
 
@@ -99,9 +122,27 @@ plus_constant_definition: constant_definition
                         | constant_definition plus_constant_definition
 ;
 
-constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON 
-                   | T_ID T_EQ T_REAL_CONST T_SEMICOLON 
-                   | T_ID T_EQ T_BOOLEAN_CONST T_SEMICOLON 
+constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
+{	
+		if(!insert_const($1, T_INTEGER))
+		{
+			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
+		}		
+}
+                   | T_ID T_EQ T_REAL_CONST T_SEMICOLON
+{	
+		if(!insert_const($1, T_REAL_CONST))
+		{
+			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
+		}		
+} 
+                   | T_ID T_EQ T_BOOLEAN_CONST T_SEMICOLON
+{	
+		if(!insert_const($1, T_BOOLEAN_CONST))
+		{
+			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
+		}
+}
 ;
 
 variable_definition_part: T_VAR plus_variable_definition
@@ -121,26 +162,54 @@ star_comma_id:
              | T_COMMA T_ID star_comma_id
 ;
 
-type: T_INTEGER 
-    | T_REAL 
-    | T_BOOLEAN 
+type: T_INTEGER
+{
+	//$$ = T_INTEGER;
+} 
+    | T_REAL
+{
+	//$$ = T_REAL;
+}
+    | T_BOOLEAN
+{
+	//$$ = T_BOOLEAN;
+}
 ;
 
-procedure_definition: procedure_block block_body T_SEMICOLON 
+procedure_definition: procedure_block block_body T_SEMICOLON
+{
+	end_block();
+} 
 ;
 
-procedure_block: T_PROCEDURE T_ID opt_brc_formal_parameter_list_brc T_SEMICOLON 
+procedure_block: init_procedure opt_brc_formal_parameter_list_brc T_SEMICOLON 
 ;
 
-opt_brc_formal_parameter_list_brc: 
+
+init_procedure: T_PROCEDURE T_ID
+{
+	begin_block();
+}
+;
+
+opt_brc_formal_parameter_list_brc:
+{
+	//quantidade_arg = 0;
+}
                                  | T_LBRACKET formal_parameter_list T_RBRACKET
 ;
 
 formal_parameter_list: parameter_definition star_smc_parameter_definition
+{
+	//quantidade_arg = 1;
+}
 ;
 
 star_smc_parameter_definition:
                              | T_SEMICOLON parameter_definition star_smc_parameter_definition
+{
+	//++quantidade_arg;
+}
 ;
 
 parameter_definition: variable_group

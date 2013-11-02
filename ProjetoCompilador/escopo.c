@@ -20,10 +20,10 @@ void begin_block();
 void end_block();
 bool search_token2_on_current_scope(int token2);
 bool search_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado);
-bool insert_var(int token1, int token2);
-bool insert_parameter(int token1, int token2);
-bool insert_procedure(int token2, int quantidade_parametros, int tipo_retorno, simbolo parametros[QTD_MAX_PARAMETROS] );
-bool insert_const(int token1, int token2);
+bool insert_var(int token2, int var_tipo);
+bool insert_parameter(int token2, int parametro_tipo);
+bool insert_procedure(int token2, int quantidade_argumentos, int tipo_retorno, int *tipo_argumentos);
+bool insert_const(int token2, int const_tipo);
 
 /* compara se o simbolo_procurado é igual ao símbolo de escopo[altura_escopo][largura_escopo] */
 bool is_equal(simbolo simbolo_procurado, int altura_escopo, int largura_escopo);
@@ -38,12 +38,16 @@ void begin_block()
 {
 	if(altura_escopo < ALTURA_ESCOPO_MAX) largura_escopo[++altura_escopo] = 0;
 	else printf("limite de altura de escopo atingido\n");
+
+	printf("novo escopo %d\n", altura_escopo);
 }
 
 void end_block()
 {
-	if(altura_escopo > 0) largura_escopo[altura_escopo--] = 0;
-		else printf("nao ha mais escopo para eliminar\n");
+	printf("eliminando escopo %d\n", altura_escopo);
+	if(altura_escopo >= 0) largura_escopo[altura_escopo--] = 0;
+	else printf("nao ha mais escopo para eliminar\n");
+
 }
 
 bool is_equal(simbolo simbolo_procurado, int altura_escopo, int largura_escopo)
@@ -58,15 +62,8 @@ bool is_equal(simbolo simbolo_procurado, int altura_escopo, int largura_escopo)
 		if(simbolo_procurado.quantidade_parametros == 0) return true;
 		else
 		{
-			if(simbolo_procurado.tipo_simbolo != simbolo_comparado.tipo_retorno) return false;
-
-			int i;
-			for(i = 0; i < simbolo_procurado.quantidade_parametros; ++i)
-			{
-				if(simbolo_procurado.parametros[i] != simbolo_comparado.parametros[i])
-					return false;
-			}
-			return true;
+			if(simbolo_procurado.tipo_retorno != simbolo_comparado.tipo_retorno) return false;
+			else return true;
 		}
 	}
 	else return false;
@@ -107,15 +104,7 @@ bool insert_symbol(simbolo simbolo_a_inserir)
 
 		if(simbolo_a_inserir.tipo_simbolo == T_PROCEDURE)
 		{
-			escopo[altura_escopo][posicao].tipo_retorno = simbolo_a_inserir.tipo_retorno;
-
-			if(simbolo_a_inserir.quantidade_parametros > 0)
-			{
-				int i;
-				for(i = 0; i < simbolo_a_inserir.quantidade_parametros; ++i)
-					escopo[altura_escopo][posicao].parametros[i] = simbolo_a_inserir.parametros[i];
-			}
-		}
+			escopo[altura_escopo][posicao].tipo_retorno = simbolo_a_inserir.tipo_retorno;		}
 
 		++largura_escopo[altura_escopo];
 		return true;
@@ -127,11 +116,11 @@ bool insert_symbol(simbolo simbolo_a_inserir)
 	}
 }
 
-bool insert_var(int token1, int token2)
+bool insert_var(int token2, int var_tipo)
 {
 	simbolo procurado;
 	procurado.tipo_simbolo = T_VAR;
-	procurado.token1 = token1;
+	procurado.token1 = var_tipo;
 	procurado.token2 = token2;
 	procurado.quantidade_parametros = 0;
 
@@ -142,11 +131,11 @@ bool insert_var(int token1, int token2)
 
 }
 
-bool insert_parameter(int token1, int token2)
+bool insert_parameter(int token2, int parametro_tipo)
 {
 	simbolo procurado;
 	procurado.tipo_simbolo = T_PARAMETER;
-	procurado.token1 = token1;
+	procurado.token1 = parametro_tipo;
 	procurado.token2 = token2;
 	procurado.quantidade_parametros = 0;
 
@@ -156,13 +145,13 @@ bool insert_parameter(int token1, int token2)
 	else return insert_symbol(procurado);
 }
 
-bool insert_procedure(int token2, int quantidade_parametros,int tipo_retorno, simbolo parametros[QTD_MAX_PARAMETROS] )
+bool insert_procedure(int token2, int quantidade_argumentos, int tipo_retorno, int *tipo_argumentos)
 {
 	simbolo procurado;
 	procurado.tipo_simbolo = T_PROCEDURE;
 	procurado.token1 = T_PROCEDURE;
 	procurado.token2 = token2;
-	procurado.quantidade_parametros = quantidade_parametros;
+	procurado.quantidade_parametros = quantidade_argumentos;
 	procurado.tipo_retorno = tipo_retorno;
 
 	bool achou = search_token2_on_current_scope(token2);
@@ -171,11 +160,12 @@ bool insert_procedure(int token2, int quantidade_parametros,int tipo_retorno, si
 	else return insert_symbol(procurado);
 }
 
-bool insert_const(int token1, int token2)
+bool insert_const(int token2, int const_tipo)
 {
+	printf("\ntentando inserir uma constante de token 2: %d", token2);
 	simbolo procurado;
 	procurado.tipo_simbolo = T_CONST;
-	procurado.token1 = token1;
+	procurado.token1 = const_tipo;
 	procurado.token2 = token2;
 	procurado.quantidade_parametros = 0;
 
@@ -253,26 +243,39 @@ void print_scopes()
 
 }
 
+/*
 int main()
 {
 	begin_block();
 
-	insert_const(T_INT_CONST, 1);
+	insert_const(1, T_INT_CONST);
 	print_current_scope();
-	insert_var(T_INTEGER, 2);
+
+
+	insert_var(2, T_BOOLEAN);
 	print_current_scope();
-	insert_parameter(T_BOOLEAN, 3);
+
+
+	insert_parameter(3, T_INTEGER);
 	print_current_scope();
 
 	printf("\n\n\n");
 	begin_block();
+
+
 	insert_procedure(4, 0, T_REAL, NULL);
 	print_current_scope();
-	insert_const(T_INT_CONST, 5);
+
+
+	insert_const(5, T_INTEGER);
 	print_current_scope();
 
 	printf("\n\n\n");
 	print_scopes();
 
+	printf("heloo ");
+
 	return 0;
+
 }
+*/
