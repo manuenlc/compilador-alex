@@ -30,6 +30,9 @@ bool is_equal(simbolo simbolo_procurado, int altura_escopo, int largura_escopo);
 /* insere o simbolo no escopo atual se a quantidade de elementos adicionados não ultrapassar LARGURA_ESCOPO_MAX */
 bool insert_symbol(simbolo simbolo_a_inserir);
 
+void print_scopes();
+void print_current_scope();
+
 
 void begin_block()
 {
@@ -185,34 +188,68 @@ bool insert_const(int token1, int token2)
 
 void print_current_scope()
 {
+	int i;
+
+	for(i = 0; i < largura_escopo[altura_escopo]; ++i)
+	{
+		simbolo simbolo_atual = escopo[altura_escopo][i];
+
+		switch (simbolo_atual.tipo_simbolo)
+		{
+		case T_PROCEDURE:
+			printf("tipo: %d token1: %d token2: %d qtdpar: %d retorno: %d",
+								simbolo_atual.tipo_simbolo, simbolo_atual.token1,
+								simbolo_atual.token2, simbolo_atual.quantidade_parametros,
+								simbolo_atual.tipo_retorno);
+			break;
+		default:
+		//case T_VAR:
+		//case T_PARAMETER:
+		//case T_CONST:
+			printf("tipo: %d token1: %d token2: %d qtdpar: %d",
+							simbolo_atual.tipo_simbolo, simbolo_atual.token1,
+							simbolo_atual.token2, simbolo_atual.quantidade_parametros);
+			}
+		printf(" -> ");
+	}
+
+	printf("#\n");
+
+
+}
+
+void print_scopes()
+{
 	int i, j;
 
 	for(i = altura_escopo; i >= 0 ; --i)
 	{
-		for(j = 0; j < largura_escopo[altura_escopo]; ++j)
+		for(j = 0; j < largura_escopo[i]; ++j)
 		{
 			simbolo simbolo_atual = escopo[i][j];
 
 			switch (simbolo_atual.tipo_simbolo)
 			{
-				case T_PROCEDURE:
-					printf("tipo: %d token1: %d token2: %d qtdpar: %d retorno: %d",
-												simbolo_atual.tipo_simbolo, simbolo_atual.token1,
-												simbolo_atual.token2, simbolo_atual.quantidade_parametros,
-												simbolo_atual.tipo_retorno);
+			case T_PROCEDURE:
+				printf("tipo: %d token1: %d token2: %d qtdpar: %d retorno: %d",
+						simbolo_atual.tipo_simbolo, simbolo_atual.token1,
+						simbolo_atual.token2, simbolo_atual.quantidade_parametros,
+						simbolo_atual.tipo_retorno);
 				break;
 			default:
 				//case T_VAR:
 				//case T_PARAMETER:
 				//case T_CONST:
-					printf("tipo: %d token1: %d token2: %d qtdpar: %d",
-							simbolo_atual.tipo_simbolo, simbolo_atual.token1,
-							simbolo_atual.token2, simbolo_atual.quantidade_parametros);
+				printf("tipo: %d token1: %d token2: %d qtdpar: %d",
+						simbolo_atual.tipo_simbolo, simbolo_atual.token1,
+						simbolo_atual.token2, simbolo_atual.quantidade_parametros);
 			}
 			printf(" -> ");
 		}
-		printf("\n");
+		printf("#\n");
 	}
+
+	printf("\n");
 
 }
 
@@ -226,11 +263,16 @@ int main()
 	print_current_scope();
 	insert_parameter(T_BOOLEAN, 3);
 	print_current_scope();
+
+	printf("\n\n\n");
+	begin_block();
 	insert_procedure(4, 0, T_REAL, NULL);
 	print_current_scope();
-	insert_const(T_INT_CONST, 4);
+	insert_const(T_INT_CONST, 5);
 	print_current_scope();
 
+	printf("\n\n\n");
+	print_scopes();
 
 	return 0;
 }
