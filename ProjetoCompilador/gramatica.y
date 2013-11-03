@@ -317,6 +317,13 @@ assignment_statement: variable_access T_ASSIGN expression
 ;
 
 procedure_statement: T_ID opt_brc_actual_parameter_list_brc
+{
+	if(!search_token2_on_current_scope_and_bellow($1))
+	{
+		printf("ERRO: A procedure %s eh utilizada na linha %d mas não foi declarada\n", get_token2_id($1), get_line());
+		//YYERROR;
+	}
+}
 ;
 
 opt_brc_actual_parameter_list_brc:
