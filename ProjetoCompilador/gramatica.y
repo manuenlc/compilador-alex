@@ -10,11 +10,12 @@ extern int yylex(void);
 extern int yyerror(char*);
 
 int quantidade_arg = 0;
-int quantidade_par = 0;
-int par_token2[20];
+int arg_token2[20];
+int arg_token1[20];
+int quantidade_arg_adicionados = 0;
 int quantidade_var = 0;
 int var_token2[20];
-bool eh_declaracao_par;
+bool eh_declaracao_procedure;
 int type_atual;
 int procedure_token2;
 
@@ -88,7 +89,7 @@ int procedure_token2;
 
 %right T_THEN T_ELSE
 
-%type<token1> type
+%type<token1> type relational_operator sign_operator multiplying_operator
 %type<token2> T_ID  
 %type<token_valor_real> T_REAL_CONST
 %type<token_valor_int> T_INT_CONST
@@ -98,9 +99,6 @@ int procedure_token2;
 
 %%
 input: T_PROGRAM T_ID T_SEMICOLON new_block block_body T_PERIOD
-{
-	end_block();
-}
 ;
 
 new_block: 
@@ -110,6 +108,9 @@ new_block:
 ;
 
 block_body: opt_constant_definition_part opt_variable_definition_part star_procedure_definition compound_statement
+{
+	end_block()
+}
 ;
 
 opt_constant_definition_part:
@@ -120,8 +121,19 @@ opt_variable_definition_part:
                             | variable_definition_part  
 ;
 
-star_procedure_definition: 
-                         | procedure_definition star_procedure_definition
+star_procedure_definition:
+{
+	eh_declaracao_procedure = false;
+	printf("\nfim de declaracao de procedure\n");
+} 
+                         | set_procedure_definition procedure_definition star_procedure_definition
+;
+
+set_procedure_definition :
+{
+	eh_declaracao_procedure = true;
+	printf("\ndeclaracao de procedure\n");
+} 
 ;
 
 constant_definition_part: T_CONST plus_constant_definition
@@ -133,9 +145,11 @@ plus_constant_definition: constant_definition
 
 constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 {	
+		 
 		if(!insert_const($1, T_INTEGER))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
+			YYERROR;
 		}		
 }
                    | T_ID T_EQ T_REAL_CONST T_SEMICOLON
@@ -143,13 +157,15 @@ constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 		if(!insert_const($1, T_REAL))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
+			YYERROR;
 		}		
 } 
                    | T_ID T_EQ T_BOOLEAN_CONST T_SEMICOLON
-{	
+{		
 		if(!insert_const($1, T_BOOLEAN))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
+			YYERROR;
 		}
 }
 ;
@@ -170,11 +186,14 @@ variable_group: T_ID star_comma_id T_COLON type
 	++quantidade_var;
 	
 	int i;
+	
+	 
 	for(i = quantidade_var - 1; i > -1; --i)
 	{
 		if(!insert_var(var_token2[i], $4))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(var_token2[i]), get_line());
+			YYERROR;
 		}
 	}
 	quantidade_var = 0;	
@@ -192,29 +211,66 @@ star_comma_id:
 
 type: T_INTEGER
 {
-	//$$ = T_INTEGER;
-} 
+	$$ = T_INTEGER;
+}
     | T_REAL
 {
-	//$$ = T_REAL;
+	$$ = T_REAL;
 }
     | T_BOOLEAN
 {
-	//$$ = T_BOOLEAN;
+	$$ = T_BOOLEAN;
 }
 ;
 
 procedure_definition: procedure_block block_body T_SEMICOLON
-{
-	end_block();
-} 
 ;
 
-procedure_block: new_block T_PROCEDURE T_ID  opt_brc_formal_parameter_list_brc T_SEMICOLON 
+procedure_block: init_procedure opt_brc_formal_parameter_list_brc T_SEMICOLON
+;
+
+init_procedure: T_PROCEDURE T_ID
+{
+	procedure_token2 = $2;
+}
 ;
 
 opt_brc_formal_parameter_list_brc:
+{
+	if(!insert_procedure(procedure_token2, 0 , NULL))
+	{
+		printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(procedure_token2), get_line());
+		YYERROR;
+	}
+	
+	begin_block();
+	
+}
                                  | T_LBRACKET formal_parameter_list T_RBRACKET
+{
+
+	if(!insert_procedure(procedure_token2, quantidade_arg_adicionados, arg_token2))
+	{
+		printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(procedure_token2), get_line());
+		YYERROR;
+	}
+	
+	begin_block();
+	
+	int i;
+	
+	for(i = 0; i < quantidade_arg_adicionados; ++i)
+	{
+		
+		if(!insert_parameter(arg_token2[i], arg_token1[i]))
+		{
+			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(arg_token2[i]), get_line());
+			YYERROR;
+		}
+	}
+	
+	quantidade_arg_adicionados = 0;
+}
 ;
 
 formal_parameter_list: parameter_definition star_smc_parameter_definition
@@ -229,26 +285,22 @@ parameter_definition: variable_group_par
 
 variable_group_par: T_ID star_comma_id_par T_COLON type
 {	
-	par_token2[quantidade_par] = $1;
-	++quantidade_par;
+	arg_token2[quantidade_arg++] = $1;
 	
 	int i;
-	for(i = quantidade_par - 1; i > -1; --i)
+	for(i = quantidade_arg_adicionados; i < quantidade_arg; ++i)
 	{
-		if(!insert_parameter(par_token2[i], $4)) 
-		{
-			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(par_token2[i]), get_line());
-		}
+		arg_token1[i] = $4;
 	}
-	quantidade_par = 0;	
+	quantidade_arg_adicionados = quantidade_arg;
 }
 ;
 
 star_comma_id_par: 
              | T_COMMA T_ID star_comma_id_par
 {
-	par_token2[quantidade_par] = $2;
-	++quantidade_par;
+	arg_token2[quantidade_arg++] = $2;
+	
 
 }
 ;
@@ -303,20 +355,20 @@ opt_relational_operator_simple_expression:
                                          | relational_operator simple_expression
 ;
 
-relational_operator: T_LT  
-                   | T_EQ  
-                   | T_GT 
-                   | T_LEQ 
-                   | T_DIF 
-                   | T_GEQ 
+relational_operator: T_LT  { $$ = T_LT;  }
+                   | T_EQ  { $$ = T_EQ;  }
+                   | T_GT  { $$ = T_GT;  }
+                   | T_LEQ { $$ = T_LEQ; }
+                   | T_DIF { $$ = T_DIF; }
+                   | T_GEQ { $$ = T_GEQ; }
 ;
 
 simple_expression: sign_operator term star_adding_operator_term
                  | term star_adding_operator_term
 ;
 
-sign_operator: T_PLUS
-             | T_MINUS
+sign_operator: T_PLUS { $$ = T_PLUS; }
+             | T_MINUS { $$ = T_MINUS; }
 ;
 
 star_adding_operator_term:
@@ -335,11 +387,11 @@ star_multiplying_operator_factor:
                                 | multiplying_operator factor star_multiplying_operator_factor
 ;
 
-multiplying_operator: T_TIMES  
-                    | T_DIV   
-                    | T_MOD    
-                    | T_AND   
-                    | T_DIVIDE
+multiplying_operator: T_TIMES  { $$ = T_TIMES;  } 
+                    | T_DIV    { $$ = T_DIV;    }
+                    | T_MOD    { $$ = T_MOD;    }
+                    | T_AND    { $$ = T_AND;    }
+                    | T_DIVIDE { $$ = T_DIVIDE; }
 ;
 
 factor: constant
@@ -348,6 +400,14 @@ factor: constant
 ;
 
 variable_access: T_ID
+{
+	
+	if(!search_token2_on_current_scope_and_bellow($1))
+	{
+		printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
+		//YYERROR;
+	}
+}
 ;
 
 constant: T_INT_CONST

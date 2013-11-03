@@ -19,6 +19,7 @@ int largura_escopo[LARGURA_ESCOPO_MAX];
 void begin_block();
 void end_block();
 bool search_token2_on_current_scope(int token2);
+bool search_token2_on_current_scope_and_bellow(int token2);
 bool search_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado);
 bool insert_var(int token2, int var_tipo);
 bool insert_parameter(int token2, int parametro_tipo);
@@ -76,13 +77,24 @@ bool search_token2_on_current_scope(int token2)
 	return false;
 }
 
+bool search_token2_on_current_scope_and_bellow(int token2)
+{
+	int i, j;
+
+	for(i = altura_escopo; i >= 0 ; --i)
+		for(j = 0; j < largura_escopo[i]; ++j)
+			if(escopo[i][j].token2 == token2) return true;
+
+	return false;
+}
+
 bool search_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado)
 {
 	int i, j;
 
 	for(i = altura_escopo; i >= 0 ; --i)
-		for(j = 0; j < largura_escopo[altura_escopo]; ++j)
-			if(is_equal(simbolo_procurado, i, i)) return true;
+		for(j = 0; j < largura_escopo[i]; ++j)
+			if(is_equal(simbolo_procurado, i, j)) return true;
 
 	return false;
 }
@@ -96,6 +108,15 @@ bool insert_symbol(simbolo simbolo_a_inserir)
 		escopo[altura_escopo][posicao].token1 = simbolo_a_inserir.token1;
 		escopo[altura_escopo][posicao].token2 =  simbolo_a_inserir.token2;
 		escopo[altura_escopo][posicao].quantidade_parametros = simbolo_a_inserir.quantidade_parametros;
+
+		int i;
+
+		if(simbolo_a_inserir.quantidade_parametros > QTD_MAX_PARAMETROS) printf("ultrapassou a quantidade maxima de parametros permitida\n");
+		else
+		for(i = 0; i < simbolo_a_inserir.quantidade_parametros; ++i)
+		{
+			escopo[altura_escopo][posicao].tipo_argumentos[i] = simbolo_a_inserir.tipo_argumentos[i];
+		}
 
 		++largura_escopo[altura_escopo];
 		return true;
@@ -146,6 +167,17 @@ bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumento
 	procurado.token1 = T_PROCEDURE;
 	procurado.token2 = token2;
 	procurado.quantidade_parametros = quantidade_argumentos;
+
+	if(quantidade_argumentos > 0)
+	{
+		int i;
+		for(i = 0; i < quantidade_argumentos; ++i)
+		{
+			printf("arg tk2: %d | ", tipo_argumentos[i]);
+			procurado.tipo_argumentos[i] = tipo_argumentos[i];
+		}
+		printf("\n");
+	}
 
 	bool achou = search_token2_on_current_scope(token2);
 
