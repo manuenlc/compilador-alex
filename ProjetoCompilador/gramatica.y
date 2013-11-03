@@ -4,12 +4,20 @@
 #include "tokens.h"
 #include "escopo.h"
 #include "gramatica.tab.h"
+#include "boolean.h"
 
 extern int yylex(void);
 extern int yyerror(char*);
 
 int quantidade_arg = 0;
-int *tipo_arg = NULL;
+int quantidade_par = 0;
+int par_token2[20];
+int quantidade_var = 0;
+int var_token2[20];
+bool eh_declaracao_par;
+int type_atual;
+int procedure_token2;
+
 
 %}
 
@@ -71,20 +79,21 @@ int *tipo_arg = NULL;
 %token T_LEQ                  45
 %token T_GT                   46
 %token T_GEQ                  47
-%token T_PARAMETER			48
-%token T_VOID				49
+%token T_PARAMETER			  48
+%token T_VOID				  49
 %token T_INVALID             255
 
 
+%no-lines
 
 %right T_THEN T_ELSE
 
-
-
+%type<token1> type
+%type<token2> T_ID  
 %type<token_valor_real> T_REAL_CONST
 %type<token_valor_int> T_INT_CONST
 %type<token_valor_boolean> T_BOOLEAN_CONST
-%type<token2> T_ID
+
 
 
 %%
@@ -131,14 +140,14 @@ constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 }
                    | T_ID T_EQ T_REAL_CONST T_SEMICOLON
 {	
-		if(!insert_const($1, T_REAL_CONST))
+		if(!insert_const($1, T_REAL))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
 		}		
 } 
                    | T_ID T_EQ T_BOOLEAN_CONST T_SEMICOLON
 {	
-		if(!insert_const($1, T_BOOLEAN_CONST))
+		if(!insert_const($1, T_BOOLEAN))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
 		}
@@ -156,10 +165,29 @@ variable_definition: variable_group T_SEMICOLON
 ;
 
 variable_group: T_ID star_comma_id T_COLON type
+{	
+	var_token2[quantidade_var] = $1;
+	++quantidade_var;
+	
+	int i;
+	for(i = quantidade_var - 1; i > -1; --i)
+	{
+		if(!insert_var(var_token2[i], $4))
+		{
+			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(var_token2[i]), get_line());
+		}
+	}
+	quantidade_var = 0;	
+}
 ;
 
 star_comma_id: 
              | T_COMMA T_ID star_comma_id
+{
+	var_token2[quantidade_var] = $2;
+	++quantidade_var;
+	
+}
 ;
 
 type: T_INTEGER
@@ -182,37 +210,47 @@ procedure_definition: procedure_block block_body T_SEMICOLON
 } 
 ;
 
-procedure_block: init_procedure opt_brc_formal_parameter_list_brc T_SEMICOLON 
-;
-
-
-init_procedure: T_PROCEDURE T_ID
-{
-	begin_block();
-}
+procedure_block: new_block T_PROCEDURE T_ID  opt_brc_formal_parameter_list_brc T_SEMICOLON 
 ;
 
 opt_brc_formal_parameter_list_brc:
-{
-	//quantidade_arg = 0;
-}
                                  | T_LBRACKET formal_parameter_list T_RBRACKET
 ;
 
 formal_parameter_list: parameter_definition star_smc_parameter_definition
-{
-	//quantidade_arg = 1;
-}
 ;
 
 star_smc_parameter_definition:
                              | T_SEMICOLON parameter_definition star_smc_parameter_definition
-{
-	//++quantidade_arg;
+;
+
+parameter_definition: variable_group_par
+;
+
+variable_group_par: T_ID star_comma_id_par T_COLON type
+{	
+	par_token2[quantidade_par] = $1;
+	++quantidade_par;
+	
+	int i;
+	for(i = quantidade_par - 1; i > -1; --i)
+	{
+		if(!insert_parameter(par_token2[i], $4)) 
+		{
+			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(par_token2[i]), get_line());
+		}
+	}
+	quantidade_par = 0;	
 }
 ;
 
-parameter_definition: variable_group
+star_comma_id_par: 
+             | T_COMMA T_ID star_comma_id_par
+{
+	par_token2[quantidade_par] = $2;
+	++quantidade_par;
+
+}
 ;
 
 statement: 

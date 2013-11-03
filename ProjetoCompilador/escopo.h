@@ -21,12 +21,8 @@ typedef struct simbolo
 	int token1;
 
 	int token2;
-	//int int_valor;
-	//float real_valor;
-	//bool bool_valor;
 
 	int quantidade_parametros; //para procedures
-	int tipo_retorno; //para procedures
 	int tipo_argumentos[QTD_MAX_PARAMETROS]; //token 1 do tipo de parametro
 
 } simbolo;
@@ -44,7 +40,7 @@ bool search_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado);
  * */
 bool insert_var(int token2, int var_tipo);
 bool insert_parameter(int token2, int parametro_tipo);
-bool insert_procedure(int token2, int quantidade_argumentos, int tipo_retorno, int *tipo_argumentos);
+bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumentos);
 bool insert_const(int token2, int const_tipo);
 
 void print_current_scope();

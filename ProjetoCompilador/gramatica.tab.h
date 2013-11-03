@@ -99,8 +99,6 @@
 typedef union YYSTYPE
 {
 
-/* Line 1676 of yacc.c  */
-#line 17 "gramatica.y"
 
     int token1;
 	int token2;
@@ -111,8 +109,6 @@ typedef union YYSTYPE
 
 
 
-/* Line 1676 of yacc.c  */
-#line 116 "gramatica.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

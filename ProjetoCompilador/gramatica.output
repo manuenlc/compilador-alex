@@ -58,149 +58,152 @@ Grammar
 
    26 procedure_definition: procedure_block block_body T_SEMICOLON
 
-   27 procedure_block: init_procedure opt_brc_formal_parameter_list_brc T_SEMICOLON
+   27 procedure_block: new_block T_PROCEDURE T_ID opt_brc_formal_parameter_list_brc T_SEMICOLON
 
-   28 init_procedure: T_PROCEDURE T_ID
+   28 opt_brc_formal_parameter_list_brc: /* empty */
+   29                                  | T_LBRACKET formal_parameter_list T_RBRACKET
 
-   29 opt_brc_formal_parameter_list_brc: /* empty */
-   30                                  | T_LBRACKET formal_parameter_list T_RBRACKET
+   30 formal_parameter_list: parameter_definition star_smc_parameter_definition
 
-   31 formal_parameter_list: parameter_definition star_smc_parameter_definition
+   31 star_smc_parameter_definition: /* empty */
+   32                              | T_SEMICOLON parameter_definition star_smc_parameter_definition
 
-   32 star_smc_parameter_definition: /* empty */
-   33                              | T_SEMICOLON parameter_definition star_smc_parameter_definition
+   33 parameter_definition: variable_group_par
 
-   34 parameter_definition: variable_group
+   34 variable_group_par: T_ID star_comma_id_par T_COLON type
 
-   35 statement: /* empty */
-   36          | procedure_statement
-   37          | if_statement
-   38          | while_statement
-   39          | compound_statement
-   40          | assignment_statement
+   35 star_comma_id_par: /* empty */
+   36                  | T_COMMA T_ID star_comma_id_par
 
-   41 assignment_statement: variable_access T_ASSIGN expression
+   37 statement: /* empty */
+   38          | procedure_statement
+   39          | if_statement
+   40          | while_statement
+   41          | compound_statement
+   42          | assignment_statement
 
-   42 procedure_statement: T_ID opt_brc_actual_parameter_list_brc
+   43 assignment_statement: variable_access T_ASSIGN expression
 
-   43 opt_brc_actual_parameter_list_brc: /* empty */
-   44                                  | T_LBRACKET actual_parameter_list T_RBRACKET
+   44 procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 
-   45 actual_parameter_list: actual_parameter star_comma_actual_parameter
+   45 opt_brc_actual_parameter_list_brc: /* empty */
+   46                                  | T_LBRACKET actual_parameter_list T_RBRACKET
 
-   46 star_comma_actual_parameter: /* empty */
-   47                            | T_COMMA actual_parameter star_comma_actual_parameter
+   47 actual_parameter_list: actual_parameter star_comma_actual_parameter
 
-   48 actual_parameter: expression
+   48 star_comma_actual_parameter: /* empty */
+   49                            | T_COMMA actual_parameter star_comma_actual_parameter
 
-   49 if_statement: T_IF expression T_THEN statement
-   50             | T_IF expression T_THEN statement T_ELSE statement
+   50 actual_parameter: expression
 
-   51 while_statement: T_WHILE expression T_DO statement
+   51 if_statement: T_IF expression T_THEN statement
+   52             | T_IF expression T_THEN statement T_ELSE statement
 
-   52 compound_statement: T_BEGIN statement star_comma_statement T_END
+   53 while_statement: T_WHILE expression T_DO statement
 
-   53 star_comma_statement: /* empty */
-   54                     | T_SEMICOLON statement star_comma_statement
+   54 compound_statement: T_BEGIN statement star_comma_statement T_END
 
-   55 expression: simple_expression opt_relational_operator_simple_expression
+   55 star_comma_statement: /* empty */
+   56                     | T_SEMICOLON statement star_comma_statement
 
-   56 opt_relational_operator_simple_expression: /* empty */
-   57                                          | relational_operator simple_expression
+   57 expression: simple_expression opt_relational_operator_simple_expression
 
-   58 relational_operator: T_LT
-   59                    | T_EQ
-   60                    | T_GT
-   61                    | T_LEQ
-   62                    | T_DIF
-   63                    | T_GEQ
+   58 opt_relational_operator_simple_expression: /* empty */
+   59                                          | relational_operator simple_expression
 
-   64 simple_expression: sign_operator term star_adding_operator_term
-   65                  | term star_adding_operator_term
+   60 relational_operator: T_LT
+   61                    | T_EQ
+   62                    | T_GT
+   63                    | T_LEQ
+   64                    | T_DIF
+   65                    | T_GEQ
 
-   66 sign_operator: T_PLUS
-   67              | T_MINUS
+   66 simple_expression: sign_operator term star_adding_operator_term
+   67                  | term star_adding_operator_term
 
-   68 star_adding_operator_term: /* empty */
-   69                          | adding_operator term star_adding_operator_term
+   68 sign_operator: T_PLUS
+   69              | T_MINUS
 
-   70 adding_operator: T_PLUS
-   71                | T_MINUS
-   72                | T_OR
+   70 star_adding_operator_term: /* empty */
+   71                          | adding_operator term star_adding_operator_term
 
-   73 term: factor star_multiplying_operator_factor
+   72 adding_operator: T_PLUS
+   73                | T_MINUS
+   74                | T_OR
 
-   74 star_multiplying_operator_factor: /* empty */
-   75                                 | multiplying_operator factor star_multiplying_operator_factor
+   75 term: factor star_multiplying_operator_factor
 
-   76 multiplying_operator: T_TIMES
-   77                     | T_DIV
-   78                     | T_MOD
-   79                     | T_AND
-   80                     | T_DIVIDE
+   76 star_multiplying_operator_factor: /* empty */
+   77                                 | multiplying_operator factor star_multiplying_operator_factor
 
-   81 factor: constant
-   82       | T_LBRACKET expression T_RBRACKET
-   83       | T_NOT factor
+   78 multiplying_operator: T_TIMES
+   79                     | T_DIV
+   80                     | T_MOD
+   81                     | T_AND
+   82                     | T_DIVIDE
 
-   84 variable_access: T_ID
+   83 factor: constant
+   84       | T_LBRACKET expression T_RBRACKET
+   85       | T_NOT factor
 
-   85 constant: T_INT_CONST
-   86         | T_REAL_CONST
-   87         | T_BOOLEAN_CONST
-   88         | variable_access
+   86 variable_access: T_ID
+
+   87 constant: T_INT_CONST
+   88         | T_REAL_CONST
+   89         | T_BOOLEAN_CONST
+   90         | variable_access
 
 
 Terminals, with rules where they appear
 
 T_EOF (0) 0
-T_ID (1) 1 13 14 15 20 22 28 42 84
-T_INT_CONST (2) 13 85
-T_REAL_CONST (3) 14 86
-T_BOOLEAN_CONST (4) 15 87
+T_ID (1) 1 13 14 15 20 22 27 34 36 44 86
+T_INT_CONST (2) 13 87
+T_REAL_CONST (3) 14 88
+T_BOOLEAN_CONST (4) 15 89
 T_PROGRAM (5) 1
-T_PROCEDURE (6) 28
-T_BEGIN (7) 52
-T_END (8) 52
-T_IF (9) 49 50
-T_THEN (10) 49 50
-T_ELSE (11) 50
-T_WHILE (12) 51
-T_DO (13) 51
-T_ASSIGN (14) 41
-T_PLUS (15) 66 70
-T_MINUS (16) 67 71
-T_TIMES (17) 76
-T_DIVIDE (18) 80
-T_DIV (19) 77
-T_MOD (20) 78
+T_PROCEDURE (6) 27
+T_BEGIN (7) 54
+T_END (8) 54
+T_IF (9) 51 52
+T_THEN (10) 51 52
+T_ELSE (11) 52
+T_WHILE (12) 53
+T_DO (13) 53
+T_ASSIGN (14) 43
+T_PLUS (15) 68 72
+T_MINUS (16) 69 73
+T_TIMES (17) 78
+T_DIVIDE (18) 82
+T_DIV (19) 79
+T_MOD (20) 80
 T_PLUS_EQ (21)
 T_MINUS_EQ (22)
 T_TIMES_EQ (23)
-T_AND (24) 79
-T_OR (25) 72
-T_NOT (26) 83
+T_AND (24) 81
+T_OR (25) 74
+T_NOT (26) 85
 T_DIVIDE_EQ (27)
 T_VAR (28) 16
 T_INTEGER (29) 23
 T_REAL (30) 24
 T_BOOLEAN (31) 25
-T_COLON (32) 20
-T_SEMICOLON (33) 1 13 14 15 19 26 27 33 54
-T_COMMA (34) 22 47
+T_COLON (32) 20 34
+T_SEMICOLON (33) 1 13 14 15 19 26 27 32 56
+T_COMMA (34) 22 36 49
 T_PERIOD (35) 1
 T_DOUBLE_PERIOD (36)
-T_LBRACKET (37) 30 44 82
-T_RBRACKET (38) 30 44 82
+T_LBRACKET (37) 29 46 84
+T_RBRACKET (38) 29 46 84
 T_CONST (39) 10
 T_REPEAT (40)
 T_UNTIL (41)
-T_EQ (42) 13 14 15 59
-T_DIF (43) 62
-T_LT (44) 58
-T_LEQ (45) 61
-T_GT (46) 60
-T_GEQ (47) 63
+T_EQ (42) 13 14 15 61
+T_DIF (43) 64
+T_LT (44) 60
+T_LEQ (45) 63
+T_GT (46) 62
+T_GEQ (47) 65
 T_PARAMETER (48)
 T_VOID (49)
 T_INVALID (255)
@@ -214,7 +217,7 @@ $accept (53)
 input (54)
     on left: 1, on right: 0
 new_block (55)
-    on left: 2, on right: 1
+    on left: 2, on right: 1 27
 block_body (56)
     on left: 3, on right: 1 26
 opt_constant_definition_part (57)
@@ -236,73 +239,75 @@ plus_variable_definition (64)
 variable_definition (65)
     on left: 19, on right: 17 18
 variable_group (66)
-    on left: 20, on right: 19 34
+    on left: 20, on right: 19
 star_comma_id (67)
     on left: 21 22, on right: 20 22
 type (68)
-    on left: 23 24 25, on right: 20
+    on left: 23 24 25, on right: 20 34
 procedure_definition (69)
     on left: 26, on right: 9
 procedure_block (70)
     on left: 27, on right: 26
-init_procedure (71)
-    on left: 28, on right: 27
-opt_brc_formal_parameter_list_brc (72)
-    on left: 29 30, on right: 27
-formal_parameter_list (73)
-    on left: 31, on right: 30
-star_smc_parameter_definition (74)
-    on left: 32 33, on right: 31 33
-parameter_definition (75)
-    on left: 34, on right: 31 33
-statement (76)
-    on left: 35 36 37 38 39 40, on right: 49 50 51 52 54
-assignment_statement (77)
-    on left: 41, on right: 40
-procedure_statement (78)
-    on left: 42, on right: 36
-opt_brc_actual_parameter_list_brc (79)
-    on left: 43 44, on right: 42
-actual_parameter_list (80)
-    on left: 45, on right: 44
-star_comma_actual_parameter (81)
-    on left: 46 47, on right: 45 47
-actual_parameter (82)
-    on left: 48, on right: 45 47
-if_statement (83)
-    on left: 49 50, on right: 37
-while_statement (84)
-    on left: 51, on right: 38
-compound_statement (85)
-    on left: 52, on right: 3 39
-star_comma_statement (86)
-    on left: 53 54, on right: 52 54
-expression (87)
-    on left: 55, on right: 41 48 49 50 51 82
-opt_relational_operator_simple_expression (88)
-    on left: 56 57, on right: 55
-relational_operator (89)
-    on left: 58 59 60 61 62 63, on right: 57
-simple_expression (90)
-    on left: 64 65, on right: 55 57
-sign_operator (91)
-    on left: 66 67, on right: 64
-star_adding_operator_term (92)
-    on left: 68 69, on right: 64 65 69
-adding_operator (93)
-    on left: 70 71 72, on right: 69
-term (94)
-    on left: 73, on right: 64 65 69
-star_multiplying_operator_factor (95)
-    on left: 74 75, on right: 73 75
-multiplying_operator (96)
-    on left: 76 77 78 79 80, on right: 75
-factor (97)
-    on left: 81 82 83, on right: 73 75 83
-variable_access (98)
-    on left: 84, on right: 41 88
-constant (99)
-    on left: 85 86 87 88, on right: 81
+opt_brc_formal_parameter_list_brc (71)
+    on left: 28 29, on right: 27
+formal_parameter_list (72)
+    on left: 30, on right: 29
+star_smc_parameter_definition (73)
+    on left: 31 32, on right: 30 32
+parameter_definition (74)
+    on left: 33, on right: 30 32
+variable_group_par (75)
+    on left: 34, on right: 33
+star_comma_id_par (76)
+    on left: 35 36, on right: 34 36
+statement (77)
+    on left: 37 38 39 40 41 42, on right: 51 52 53 54 56
+assignment_statement (78)
+    on left: 43, on right: 42
+procedure_statement (79)
+    on left: 44, on right: 38
+opt_brc_actual_parameter_list_brc (80)
+    on left: 45 46, on right: 44
+actual_parameter_list (81)
+    on left: 47, on right: 46
+star_comma_actual_parameter (82)
+    on left: 48 49, on right: 47 49
+actual_parameter (83)
+    on left: 50, on right: 47 49
+if_statement (84)
+    on left: 51 52, on right: 39
+while_statement (85)
+    on left: 53, on right: 40
+compound_statement (86)
+    on left: 54, on right: 3 41
+star_comma_statement (87)
+    on left: 55 56, on right: 54 56
+expression (88)
+    on left: 57, on right: 43 50 51 52 53 84
+opt_relational_operator_simple_expression (89)
+    on left: 58 59, on right: 57
+relational_operator (90)
+    on left: 60 61 62 63 64 65, on right: 59
+simple_expression (91)
+    on left: 66 67, on right: 57 59
+sign_operator (92)
+    on left: 68 69, on right: 66
+star_adding_operator_term (93)
+    on left: 70 71, on right: 66 67 71
+adding_operator (94)
+    on left: 72 73 74, on right: 71
+term (95)
+    on left: 75, on right: 66 67 71
+star_multiplying_operator_factor (96)
+    on left: 76 77, on right: 75 77
+multiplying_operator (97)
+    on left: 78 79 80 81 82, on right: 77
+factor (98)
+    on left: 83 84 85, on right: 75 77 85
+variable_access (99)
+    on left: 86, on right: 43 90
+constant (100)
+    on left: 87 88 89 90, on right: 83
 
 
 state 0
@@ -451,14 +456,13 @@ state 16
 
     3 block_body: opt_constant_definition_part opt_variable_definition_part . star_procedure_definition compound_statement
 
-    T_PROCEDURE  shift, and go to state 24
+    T_BEGIN   reduce using rule 8 (star_procedure_definition)
+    $default  reduce using rule 2 (new_block)
 
-    $default  reduce using rule 8 (star_procedure_definition)
-
+    new_block                  go to state 24
     star_procedure_definition  go to state 25
     procedure_definition       go to state 26
     procedure_block            go to state 27
-    init_procedure             go to state 28
 
 
 state 17
@@ -474,9 +478,9 @@ state 18
    14                    | T_ID T_EQ . T_REAL_CONST T_SEMICOLON
    15                    | T_ID T_EQ . T_BOOLEAN_CONST T_SEMICOLON
 
-    T_INT_CONST      shift, and go to state 29
-    T_REAL_CONST     shift, and go to state 30
-    T_BOOLEAN_CONST  shift, and go to state 31
+    T_INT_CONST      shift, and go to state 28
+    T_REAL_CONST     shift, and go to state 29
+    T_BOOLEAN_CONST  shift, and go to state 30
 
 
 state 19
@@ -490,11 +494,11 @@ state 20
 
    20 variable_group: T_ID . star_comma_id T_COLON type
 
-    T_COMMA  shift, and go to state 32
+    T_COMMA  shift, and go to state 31
 
     $default  reduce using rule 21 (star_comma_id)
 
-    star_comma_id  go to state 33
+    star_comma_id  go to state 32
 
 
 state 21
@@ -513,7 +517,7 @@ state 22
 
     $default  reduce using rule 17 (plus_variable_definition)
 
-    plus_variable_definition  go to state 34
+    plus_variable_definition  go to state 33
     variable_definition       go to state 22
     variable_group            go to state 23
 
@@ -522,37 +526,36 @@ state 23
 
    19 variable_definition: variable_group . T_SEMICOLON
 
-    T_SEMICOLON  shift, and go to state 35
+    T_SEMICOLON  shift, and go to state 34
 
 
 state 24
 
-   28 init_procedure: T_PROCEDURE . T_ID
+   27 procedure_block: new_block . T_PROCEDURE T_ID opt_brc_formal_parameter_list_brc T_SEMICOLON
 
-    T_ID  shift, and go to state 36
+    T_PROCEDURE  shift, and go to state 35
 
 
 state 25
 
     3 block_body: opt_constant_definition_part opt_variable_definition_part star_procedure_definition . compound_statement
 
-    T_BEGIN  shift, and go to state 37
+    T_BEGIN  shift, and go to state 36
 
-    compound_statement  go to state 38
+    compound_statement  go to state 37
 
 
 state 26
 
     9 star_procedure_definition: procedure_definition . star_procedure_definition
 
-    T_PROCEDURE  shift, and go to state 24
+    T_BEGIN   reduce using rule 8 (star_procedure_definition)
+    $default  reduce using rule 2 (new_block)
 
-    $default  reduce using rule 8 (star_procedure_definition)
-
-    star_procedure_definition  go to state 39
+    new_block                  go to state 24
+    star_procedure_definition  go to state 38
     procedure_definition       go to state 26
     procedure_block            go to state 27
-    init_procedure             go to state 28
 
 
 state 27
@@ -563,1118 +566,1179 @@ state 27
 
     $default  reduce using rule 4 (opt_constant_definition_part)
 
-    block_body                    go to state 40
+    block_body                    go to state 39
     opt_constant_definition_part  go to state 9
     constant_definition_part      go to state 10
 
 
 state 28
 
-   27 procedure_block: init_procedure . opt_brc_formal_parameter_list_brc T_SEMICOLON
+   13 constant_definition: T_ID T_EQ T_INT_CONST . T_SEMICOLON
 
-    T_LBRACKET  shift, and go to state 41
-
-    $default  reduce using rule 29 (opt_brc_formal_parameter_list_brc)
-
-    opt_brc_formal_parameter_list_brc  go to state 42
+    T_SEMICOLON  shift, and go to state 40
 
 
 state 29
 
-   13 constant_definition: T_ID T_EQ T_INT_CONST . T_SEMICOLON
+   14 constant_definition: T_ID T_EQ T_REAL_CONST . T_SEMICOLON
 
-    T_SEMICOLON  shift, and go to state 43
+    T_SEMICOLON  shift, and go to state 41
 
 
 state 30
 
-   14 constant_definition: T_ID T_EQ T_REAL_CONST . T_SEMICOLON
+   15 constant_definition: T_ID T_EQ T_BOOLEAN_CONST . T_SEMICOLON
 
-    T_SEMICOLON  shift, and go to state 44
+    T_SEMICOLON  shift, and go to state 42
 
 
 state 31
 
-   15 constant_definition: T_ID T_EQ T_BOOLEAN_CONST . T_SEMICOLON
+   22 star_comma_id: T_COMMA . T_ID star_comma_id
 
-    T_SEMICOLON  shift, and go to state 45
+    T_ID  shift, and go to state 43
 
 
 state 32
 
-   22 star_comma_id: T_COMMA . T_ID star_comma_id
+   20 variable_group: T_ID star_comma_id . T_COLON type
 
-    T_ID  shift, and go to state 46
+    T_COLON  shift, and go to state 44
 
 
 state 33
-
-   20 variable_group: T_ID star_comma_id . T_COLON type
-
-    T_COLON  shift, and go to state 47
-
-
-state 34
 
    18 plus_variable_definition: variable_definition plus_variable_definition .
 
     $default  reduce using rule 18 (plus_variable_definition)
 
 
-state 35
+state 34
 
    19 variable_definition: variable_group T_SEMICOLON .
 
     $default  reduce using rule 19 (variable_definition)
 
 
+state 35
+
+   27 procedure_block: new_block T_PROCEDURE . T_ID opt_brc_formal_parameter_list_brc T_SEMICOLON
+
+    T_ID  shift, and go to state 45
+
+
 state 36
 
-   28 init_procedure: T_PROCEDURE T_ID .
+   54 compound_statement: T_BEGIN . statement star_comma_statement T_END
 
-    $default  reduce using rule 28 (init_procedure)
+    T_ID     shift, and go to state 46
+    T_BEGIN  shift, and go to state 36
+    T_IF     shift, and go to state 47
+    T_WHILE  shift, and go to state 48
+
+    $default  reduce using rule 37 (statement)
+
+    statement             go to state 49
+    assignment_statement  go to state 50
+    procedure_statement   go to state 51
+    if_statement          go to state 52
+    while_statement       go to state 53
+    compound_statement    go to state 54
+    variable_access       go to state 55
 
 
 state 37
-
-   52 compound_statement: T_BEGIN . statement star_comma_statement T_END
-
-    T_ID     shift, and go to state 48
-    T_BEGIN  shift, and go to state 37
-    T_IF     shift, and go to state 49
-    T_WHILE  shift, and go to state 50
-
-    $default  reduce using rule 35 (statement)
-
-    statement             go to state 51
-    assignment_statement  go to state 52
-    procedure_statement   go to state 53
-    if_statement          go to state 54
-    while_statement       go to state 55
-    compound_statement    go to state 56
-    variable_access       go to state 57
-
-
-state 38
 
     3 block_body: opt_constant_definition_part opt_variable_definition_part star_procedure_definition compound_statement .
 
     $default  reduce using rule 3 (block_body)
 
 
-state 39
+state 38
 
     9 star_procedure_definition: procedure_definition star_procedure_definition .
 
     $default  reduce using rule 9 (star_procedure_definition)
 
 
-state 40
+state 39
 
    26 procedure_definition: procedure_block block_body . T_SEMICOLON
 
-    T_SEMICOLON  shift, and go to state 58
+    T_SEMICOLON  shift, and go to state 56
 
 
-state 41
-
-   30 opt_brc_formal_parameter_list_brc: T_LBRACKET . formal_parameter_list T_RBRACKET
-
-    T_ID  shift, and go to state 20
-
-    variable_group         go to state 59
-    formal_parameter_list  go to state 60
-    parameter_definition   go to state 61
-
-
-state 42
-
-   27 procedure_block: init_procedure opt_brc_formal_parameter_list_brc . T_SEMICOLON
-
-    T_SEMICOLON  shift, and go to state 62
-
-
-state 43
+state 40
 
    13 constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON .
 
     $default  reduce using rule 13 (constant_definition)
 
 
-state 44
+state 41
 
    14 constant_definition: T_ID T_EQ T_REAL_CONST T_SEMICOLON .
 
     $default  reduce using rule 14 (constant_definition)
 
 
-state 45
+state 42
 
    15 constant_definition: T_ID T_EQ T_BOOLEAN_CONST T_SEMICOLON .
 
     $default  reduce using rule 15 (constant_definition)
 
 
-state 46
+state 43
 
    22 star_comma_id: T_COMMA T_ID . star_comma_id
 
-    T_COMMA  shift, and go to state 32
+    T_COMMA  shift, and go to state 31
 
     $default  reduce using rule 21 (star_comma_id)
 
-    star_comma_id  go to state 63
+    star_comma_id  go to state 57
+
+
+state 44
+
+   20 variable_group: T_ID star_comma_id T_COLON . type
+
+    T_INTEGER  shift, and go to state 58
+    T_REAL     shift, and go to state 59
+    T_BOOLEAN  shift, and go to state 60
+
+    type  go to state 61
+
+
+state 45
+
+   27 procedure_block: new_block T_PROCEDURE T_ID . opt_brc_formal_parameter_list_brc T_SEMICOLON
+
+    T_LBRACKET  shift, and go to state 62
+
+    $default  reduce using rule 28 (opt_brc_formal_parameter_list_brc)
+
+    opt_brc_formal_parameter_list_brc  go to state 63
+
+
+state 46
+
+   44 procedure_statement: T_ID . opt_brc_actual_parameter_list_brc
+   86 variable_access: T_ID .
+
+    T_LBRACKET  shift, and go to state 64
+
+    T_ASSIGN  reduce using rule 86 (variable_access)
+    $default  reduce using rule 45 (opt_brc_actual_parameter_list_brc)
+
+    opt_brc_actual_parameter_list_brc  go to state 65
 
 
 state 47
 
-   20 variable_group: T_ID star_comma_id T_COLON . type
+   51 if_statement: T_IF . expression T_THEN statement
+   52             | T_IF . expression T_THEN statement T_ELSE statement
 
-    T_INTEGER  shift, and go to state 64
-    T_REAL     shift, and go to state 65
-    T_BOOLEAN  shift, and go to state 66
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_PLUS           shift, and go to state 70
+    T_MINUS          shift, and go to state 71
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
 
-    type  go to state 67
+    expression         go to state 74
+    simple_expression  go to state 75
+    sign_operator      go to state 76
+    term               go to state 77
+    factor             go to state 78
+    variable_access    go to state 79
+    constant           go to state 80
 
 
 state 48
 
-   42 procedure_statement: T_ID . opt_brc_actual_parameter_list_brc
-   84 variable_access: T_ID .
+   53 while_statement: T_WHILE . expression T_DO statement
 
-    T_LBRACKET  shift, and go to state 68
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_PLUS           shift, and go to state 70
+    T_MINUS          shift, and go to state 71
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
 
-    T_ASSIGN  reduce using rule 84 (variable_access)
-    $default  reduce using rule 43 (opt_brc_actual_parameter_list_brc)
-
-    opt_brc_actual_parameter_list_brc  go to state 69
+    expression         go to state 81
+    simple_expression  go to state 75
+    sign_operator      go to state 76
+    term               go to state 77
+    factor             go to state 78
+    variable_access    go to state 79
+    constant           go to state 80
 
 
 state 49
 
-   49 if_statement: T_IF . expression T_THEN statement
-   50             | T_IF . expression T_THEN statement T_ELSE statement
+   54 compound_statement: T_BEGIN statement . star_comma_statement T_END
 
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_PLUS           shift, and go to state 74
-    T_MINUS          shift, and go to state 75
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
+    T_SEMICOLON  shift, and go to state 82
 
-    expression         go to state 78
-    simple_expression  go to state 79
-    sign_operator      go to state 80
-    term               go to state 81
-    factor             go to state 82
-    variable_access    go to state 83
-    constant           go to state 84
+    $default  reduce using rule 55 (star_comma_statement)
+
+    star_comma_statement  go to state 83
 
 
 state 50
 
-   51 while_statement: T_WHILE . expression T_DO statement
+   42 statement: assignment_statement .
 
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_PLUS           shift, and go to state 74
-    T_MINUS          shift, and go to state 75
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
-
-    expression         go to state 85
-    simple_expression  go to state 79
-    sign_operator      go to state 80
-    term               go to state 81
-    factor             go to state 82
-    variable_access    go to state 83
-    constant           go to state 84
+    $default  reduce using rule 42 (statement)
 
 
 state 51
 
-   52 compound_statement: T_BEGIN statement . star_comma_statement T_END
-
-    T_SEMICOLON  shift, and go to state 86
-
-    $default  reduce using rule 53 (star_comma_statement)
-
-    star_comma_statement  go to state 87
-
-
-state 52
-
-   40 statement: assignment_statement .
-
-    $default  reduce using rule 40 (statement)
-
-
-state 53
-
-   36 statement: procedure_statement .
-
-    $default  reduce using rule 36 (statement)
-
-
-state 54
-
-   37 statement: if_statement .
-
-    $default  reduce using rule 37 (statement)
-
-
-state 55
-
-   38 statement: while_statement .
+   38 statement: procedure_statement .
 
     $default  reduce using rule 38 (statement)
 
 
-state 56
+state 52
 
-   39 statement: compound_statement .
+   39 statement: if_statement .
 
     $default  reduce using rule 39 (statement)
 
 
-state 57
+state 53
 
-   41 assignment_statement: variable_access . T_ASSIGN expression
+   40 statement: while_statement .
 
-    T_ASSIGN  shift, and go to state 88
+    $default  reduce using rule 40 (statement)
 
 
-state 58
+state 54
+
+   41 statement: compound_statement .
+
+    $default  reduce using rule 41 (statement)
+
+
+state 55
+
+   43 assignment_statement: variable_access . T_ASSIGN expression
+
+    T_ASSIGN  shift, and go to state 84
+
+
+state 56
 
    26 procedure_definition: procedure_block block_body T_SEMICOLON .
 
     $default  reduce using rule 26 (procedure_definition)
 
 
-state 59
-
-   34 parameter_definition: variable_group .
-
-    $default  reduce using rule 34 (parameter_definition)
-
-
-state 60
-
-   30 opt_brc_formal_parameter_list_brc: T_LBRACKET formal_parameter_list . T_RBRACKET
-
-    T_RBRACKET  shift, and go to state 89
-
-
-state 61
-
-   31 formal_parameter_list: parameter_definition . star_smc_parameter_definition
-
-    T_SEMICOLON  shift, and go to state 90
-
-    $default  reduce using rule 32 (star_smc_parameter_definition)
-
-    star_smc_parameter_definition  go to state 91
-
-
-state 62
-
-   27 procedure_block: init_procedure opt_brc_formal_parameter_list_brc T_SEMICOLON .
-
-    $default  reduce using rule 27 (procedure_block)
-
-
-state 63
+state 57
 
    22 star_comma_id: T_COMMA T_ID star_comma_id .
 
     $default  reduce using rule 22 (star_comma_id)
 
 
-state 64
+state 58
 
    23 type: T_INTEGER .
 
     $default  reduce using rule 23 (type)
 
 
-state 65
+state 59
 
    24 type: T_REAL .
 
     $default  reduce using rule 24 (type)
 
 
-state 66
+state 60
 
    25 type: T_BOOLEAN .
 
     $default  reduce using rule 25 (type)
 
 
-state 67
+state 61
 
    20 variable_group: T_ID star_comma_id T_COLON type .
 
     $default  reduce using rule 20 (variable_group)
 
 
-state 68
+state 62
 
-   44 opt_brc_actual_parameter_list_brc: T_LBRACKET . actual_parameter_list T_RBRACKET
+   29 opt_brc_formal_parameter_list_brc: T_LBRACKET . formal_parameter_list T_RBRACKET
 
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_PLUS           shift, and go to state 74
-    T_MINUS          shift, and go to state 75
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
+    T_ID  shift, and go to state 85
 
-    actual_parameter_list  go to state 92
-    actual_parameter       go to state 93
-    expression             go to state 94
-    simple_expression      go to state 79
-    sign_operator          go to state 80
-    term                   go to state 81
-    factor                 go to state 82
-    variable_access        go to state 83
-    constant               go to state 84
+    formal_parameter_list  go to state 86
+    parameter_definition   go to state 87
+    variable_group_par     go to state 88
 
 
-state 69
+state 63
 
-   42 procedure_statement: T_ID opt_brc_actual_parameter_list_brc .
+   27 procedure_block: new_block T_PROCEDURE T_ID opt_brc_formal_parameter_list_brc . T_SEMICOLON
 
-    $default  reduce using rule 42 (procedure_statement)
-
-
-state 70
-
-   84 variable_access: T_ID .
-
-    $default  reduce using rule 84 (variable_access)
+    T_SEMICOLON  shift, and go to state 89
 
 
-state 71
+state 64
 
-   85 constant: T_INT_CONST .
+   46 opt_brc_actual_parameter_list_brc: T_LBRACKET . actual_parameter_list T_RBRACKET
 
-    $default  reduce using rule 85 (constant)
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_PLUS           shift, and go to state 70
+    T_MINUS          shift, and go to state 71
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
+
+    actual_parameter_list  go to state 90
+    actual_parameter       go to state 91
+    expression             go to state 92
+    simple_expression      go to state 75
+    sign_operator          go to state 76
+    term                   go to state 77
+    factor                 go to state 78
+    variable_access        go to state 79
+    constant               go to state 80
 
 
-state 72
+state 65
 
-   86 constant: T_REAL_CONST .
+   44 procedure_statement: T_ID opt_brc_actual_parameter_list_brc .
 
-    $default  reduce using rule 86 (constant)
+    $default  reduce using rule 44 (procedure_statement)
 
 
-state 73
+state 66
 
-   87 constant: T_BOOLEAN_CONST .
+   86 variable_access: T_ID .
+
+    $default  reduce using rule 86 (variable_access)
+
+
+state 67
+
+   87 constant: T_INT_CONST .
 
     $default  reduce using rule 87 (constant)
 
 
-state 74
+state 68
 
-   66 sign_operator: T_PLUS .
-
-    $default  reduce using rule 66 (sign_operator)
-
-
-state 75
-
-   67 sign_operator: T_MINUS .
-
-    $default  reduce using rule 67 (sign_operator)
-
-
-state 76
-
-   83 factor: T_NOT . factor
-
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
-
-    factor           go to state 95
-    variable_access  go to state 83
-    constant         go to state 84
-
-
-state 77
-
-   82 factor: T_LBRACKET . expression T_RBRACKET
-
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_PLUS           shift, and go to state 74
-    T_MINUS          shift, and go to state 75
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
-
-    expression         go to state 96
-    simple_expression  go to state 79
-    sign_operator      go to state 80
-    term               go to state 81
-    factor             go to state 82
-    variable_access    go to state 83
-    constant           go to state 84
-
-
-state 78
-
-   49 if_statement: T_IF expression . T_THEN statement
-   50             | T_IF expression . T_THEN statement T_ELSE statement
-
-    T_THEN  shift, and go to state 97
-
-
-state 79
-
-   55 expression: simple_expression . opt_relational_operator_simple_expression
-
-    T_EQ   shift, and go to state 98
-    T_DIF  shift, and go to state 99
-    T_LT   shift, and go to state 100
-    T_LEQ  shift, and go to state 101
-    T_GT   shift, and go to state 102
-    T_GEQ  shift, and go to state 103
-
-    $default  reduce using rule 56 (opt_relational_operator_simple_expression)
-
-    opt_relational_operator_simple_expression  go to state 104
-    relational_operator                        go to state 105
-
-
-state 80
-
-   64 simple_expression: sign_operator . term star_adding_operator_term
-
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
-
-    term             go to state 106
-    factor           go to state 82
-    variable_access  go to state 83
-    constant         go to state 84
-
-
-state 81
-
-   65 simple_expression: term . star_adding_operator_term
-
-    T_PLUS   shift, and go to state 107
-    T_MINUS  shift, and go to state 108
-    T_OR     shift, and go to state 109
-
-    $default  reduce using rule 68 (star_adding_operator_term)
-
-    star_adding_operator_term  go to state 110
-    adding_operator            go to state 111
-
-
-state 82
-
-   73 term: factor . star_multiplying_operator_factor
-
-    T_TIMES   shift, and go to state 112
-    T_DIVIDE  shift, and go to state 113
-    T_DIV     shift, and go to state 114
-    T_MOD     shift, and go to state 115
-    T_AND     shift, and go to state 116
-
-    $default  reduce using rule 74 (star_multiplying_operator_factor)
-
-    star_multiplying_operator_factor  go to state 117
-    multiplying_operator              go to state 118
-
-
-state 83
-
-   88 constant: variable_access .
+   88 constant: T_REAL_CONST .
 
     $default  reduce using rule 88 (constant)
 
 
-state 84
+state 69
 
-   81 factor: constant .
+   89 constant: T_BOOLEAN_CONST .
 
-    $default  reduce using rule 81 (factor)
-
-
-state 85
-
-   51 while_statement: T_WHILE expression . T_DO statement
-
-    T_DO  shift, and go to state 119
+    $default  reduce using rule 89 (constant)
 
 
-state 86
+state 70
 
-   54 star_comma_statement: T_SEMICOLON . statement star_comma_statement
+   68 sign_operator: T_PLUS .
 
-    T_ID     shift, and go to state 48
-    T_BEGIN  shift, and go to state 37
-    T_IF     shift, and go to state 49
-    T_WHILE  shift, and go to state 50
-
-    $default  reduce using rule 35 (statement)
-
-    statement             go to state 120
-    assignment_statement  go to state 52
-    procedure_statement   go to state 53
-    if_statement          go to state 54
-    while_statement       go to state 55
-    compound_statement    go to state 56
-    variable_access       go to state 57
+    $default  reduce using rule 68 (sign_operator)
 
 
-state 87
+state 71
 
-   52 compound_statement: T_BEGIN statement star_comma_statement . T_END
+   69 sign_operator: T_MINUS .
 
-    T_END  shift, and go to state 121
-
-
-state 88
-
-   41 assignment_statement: variable_access T_ASSIGN . expression
-
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_PLUS           shift, and go to state 74
-    T_MINUS          shift, and go to state 75
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
-
-    expression         go to state 122
-    simple_expression  go to state 79
-    sign_operator      go to state 80
-    term               go to state 81
-    factor             go to state 82
-    variable_access    go to state 83
-    constant           go to state 84
+    $default  reduce using rule 69 (sign_operator)
 
 
-state 89
+state 72
 
-   30 opt_brc_formal_parameter_list_brc: T_LBRACKET formal_parameter_list T_RBRACKET .
+   85 factor: T_NOT . factor
 
-    $default  reduce using rule 30 (opt_brc_formal_parameter_list_brc)
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
 
-
-state 90
-
-   33 star_smc_parameter_definition: T_SEMICOLON . parameter_definition star_smc_parameter_definition
-
-    T_ID  shift, and go to state 20
-
-    variable_group        go to state 59
-    parameter_definition  go to state 123
-
-
-state 91
-
-   31 formal_parameter_list: parameter_definition star_smc_parameter_definition .
-
-    $default  reduce using rule 31 (formal_parameter_list)
+    factor           go to state 93
+    variable_access  go to state 79
+    constant         go to state 80
 
 
-state 92
+state 73
 
-   44 opt_brc_actual_parameter_list_brc: T_LBRACKET actual_parameter_list . T_RBRACKET
+   84 factor: T_LBRACKET . expression T_RBRACKET
 
-    T_RBRACKET  shift, and go to state 124
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_PLUS           shift, and go to state 70
+    T_MINUS          shift, and go to state 71
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
 
-
-state 93
-
-   45 actual_parameter_list: actual_parameter . star_comma_actual_parameter
-
-    T_COMMA  shift, and go to state 125
-
-    $default  reduce using rule 46 (star_comma_actual_parameter)
-
-    star_comma_actual_parameter  go to state 126
-
-
-state 94
-
-   48 actual_parameter: expression .
-
-    $default  reduce using rule 48 (actual_parameter)
+    expression         go to state 94
+    simple_expression  go to state 75
+    sign_operator      go to state 76
+    term               go to state 77
+    factor             go to state 78
+    variable_access    go to state 79
+    constant           go to state 80
 
 
-state 95
+state 74
 
-   83 factor: T_NOT factor .
+   51 if_statement: T_IF expression . T_THEN statement
+   52             | T_IF expression . T_THEN statement T_ELSE statement
+
+    T_THEN  shift, and go to state 95
+
+
+state 75
+
+   57 expression: simple_expression . opt_relational_operator_simple_expression
+
+    T_EQ   shift, and go to state 96
+    T_DIF  shift, and go to state 97
+    T_LT   shift, and go to state 98
+    T_LEQ  shift, and go to state 99
+    T_GT   shift, and go to state 100
+    T_GEQ  shift, and go to state 101
+
+    $default  reduce using rule 58 (opt_relational_operator_simple_expression)
+
+    opt_relational_operator_simple_expression  go to state 102
+    relational_operator                        go to state 103
+
+
+state 76
+
+   66 simple_expression: sign_operator . term star_adding_operator_term
+
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
+
+    term             go to state 104
+    factor           go to state 78
+    variable_access  go to state 79
+    constant         go to state 80
+
+
+state 77
+
+   67 simple_expression: term . star_adding_operator_term
+
+    T_PLUS   shift, and go to state 105
+    T_MINUS  shift, and go to state 106
+    T_OR     shift, and go to state 107
+
+    $default  reduce using rule 70 (star_adding_operator_term)
+
+    star_adding_operator_term  go to state 108
+    adding_operator            go to state 109
+
+
+state 78
+
+   75 term: factor . star_multiplying_operator_factor
+
+    T_TIMES   shift, and go to state 110
+    T_DIVIDE  shift, and go to state 111
+    T_DIV     shift, and go to state 112
+    T_MOD     shift, and go to state 113
+    T_AND     shift, and go to state 114
+
+    $default  reduce using rule 76 (star_multiplying_operator_factor)
+
+    star_multiplying_operator_factor  go to state 115
+    multiplying_operator              go to state 116
+
+
+state 79
+
+   90 constant: variable_access .
+
+    $default  reduce using rule 90 (constant)
+
+
+state 80
+
+   83 factor: constant .
 
     $default  reduce using rule 83 (factor)
 
 
+state 81
+
+   53 while_statement: T_WHILE expression . T_DO statement
+
+    T_DO  shift, and go to state 117
+
+
+state 82
+
+   56 star_comma_statement: T_SEMICOLON . statement star_comma_statement
+
+    T_ID     shift, and go to state 46
+    T_BEGIN  shift, and go to state 36
+    T_IF     shift, and go to state 47
+    T_WHILE  shift, and go to state 48
+
+    $default  reduce using rule 37 (statement)
+
+    statement             go to state 118
+    assignment_statement  go to state 50
+    procedure_statement   go to state 51
+    if_statement          go to state 52
+    while_statement       go to state 53
+    compound_statement    go to state 54
+    variable_access       go to state 55
+
+
+state 83
+
+   54 compound_statement: T_BEGIN statement star_comma_statement . T_END
+
+    T_END  shift, and go to state 119
+
+
+state 84
+
+   43 assignment_statement: variable_access T_ASSIGN . expression
+
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_PLUS           shift, and go to state 70
+    T_MINUS          shift, and go to state 71
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
+
+    expression         go to state 120
+    simple_expression  go to state 75
+    sign_operator      go to state 76
+    term               go to state 77
+    factor             go to state 78
+    variable_access    go to state 79
+    constant           go to state 80
+
+
+state 85
+
+   34 variable_group_par: T_ID . star_comma_id_par T_COLON type
+
+    T_COMMA  shift, and go to state 121
+
+    $default  reduce using rule 35 (star_comma_id_par)
+
+    star_comma_id_par  go to state 122
+
+
+state 86
+
+   29 opt_brc_formal_parameter_list_brc: T_LBRACKET formal_parameter_list . T_RBRACKET
+
+    T_RBRACKET  shift, and go to state 123
+
+
+state 87
+
+   30 formal_parameter_list: parameter_definition . star_smc_parameter_definition
+
+    T_SEMICOLON  shift, and go to state 124
+
+    $default  reduce using rule 31 (star_smc_parameter_definition)
+
+    star_smc_parameter_definition  go to state 125
+
+
+state 88
+
+   33 parameter_definition: variable_group_par .
+
+    $default  reduce using rule 33 (parameter_definition)
+
+
+state 89
+
+   27 procedure_block: new_block T_PROCEDURE T_ID opt_brc_formal_parameter_list_brc T_SEMICOLON .
+
+    $default  reduce using rule 27 (procedure_block)
+
+
+state 90
+
+   46 opt_brc_actual_parameter_list_brc: T_LBRACKET actual_parameter_list . T_RBRACKET
+
+    T_RBRACKET  shift, and go to state 126
+
+
+state 91
+
+   47 actual_parameter_list: actual_parameter . star_comma_actual_parameter
+
+    T_COMMA  shift, and go to state 127
+
+    $default  reduce using rule 48 (star_comma_actual_parameter)
+
+    star_comma_actual_parameter  go to state 128
+
+
+state 92
+
+   50 actual_parameter: expression .
+
+    $default  reduce using rule 50 (actual_parameter)
+
+
+state 93
+
+   85 factor: T_NOT factor .
+
+    $default  reduce using rule 85 (factor)
+
+
+state 94
+
+   84 factor: T_LBRACKET expression . T_RBRACKET
+
+    T_RBRACKET  shift, and go to state 129
+
+
+state 95
+
+   51 if_statement: T_IF expression T_THEN . statement
+   52             | T_IF expression T_THEN . statement T_ELSE statement
+
+    T_ID     shift, and go to state 46
+    T_BEGIN  shift, and go to state 36
+    T_IF     shift, and go to state 47
+    T_WHILE  shift, and go to state 48
+
+    $default  reduce using rule 37 (statement)
+
+    statement             go to state 130
+    assignment_statement  go to state 50
+    procedure_statement   go to state 51
+    if_statement          go to state 52
+    while_statement       go to state 53
+    compound_statement    go to state 54
+    variable_access       go to state 55
+
+
 state 96
 
-   82 factor: T_LBRACKET expression . T_RBRACKET
-
-    T_RBRACKET  shift, and go to state 127
-
-
-state 97
-
-   49 if_statement: T_IF expression T_THEN . statement
-   50             | T_IF expression T_THEN . statement T_ELSE statement
-
-    T_ID     shift, and go to state 48
-    T_BEGIN  shift, and go to state 37
-    T_IF     shift, and go to state 49
-    T_WHILE  shift, and go to state 50
-
-    $default  reduce using rule 35 (statement)
-
-    statement             go to state 128
-    assignment_statement  go to state 52
-    procedure_statement   go to state 53
-    if_statement          go to state 54
-    while_statement       go to state 55
-    compound_statement    go to state 56
-    variable_access       go to state 57
-
-
-state 98
-
-   59 relational_operator: T_EQ .
-
-    $default  reduce using rule 59 (relational_operator)
-
-
-state 99
-
-   62 relational_operator: T_DIF .
-
-    $default  reduce using rule 62 (relational_operator)
-
-
-state 100
-
-   58 relational_operator: T_LT .
-
-    $default  reduce using rule 58 (relational_operator)
-
-
-state 101
-
-   61 relational_operator: T_LEQ .
+   61 relational_operator: T_EQ .
 
     $default  reduce using rule 61 (relational_operator)
 
 
-state 102
+state 97
 
-   60 relational_operator: T_GT .
+   64 relational_operator: T_DIF .
+
+    $default  reduce using rule 64 (relational_operator)
+
+
+state 98
+
+   60 relational_operator: T_LT .
 
     $default  reduce using rule 60 (relational_operator)
 
 
-state 103
+state 99
 
-   63 relational_operator: T_GEQ .
+   63 relational_operator: T_LEQ .
 
     $default  reduce using rule 63 (relational_operator)
 
 
+state 100
+
+   62 relational_operator: T_GT .
+
+    $default  reduce using rule 62 (relational_operator)
+
+
+state 101
+
+   65 relational_operator: T_GEQ .
+
+    $default  reduce using rule 65 (relational_operator)
+
+
+state 102
+
+   57 expression: simple_expression opt_relational_operator_simple_expression .
+
+    $default  reduce using rule 57 (expression)
+
+
+state 103
+
+   59 opt_relational_operator_simple_expression: relational_operator . simple_expression
+
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_PLUS           shift, and go to state 70
+    T_MINUS          shift, and go to state 71
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
+
+    simple_expression  go to state 131
+    sign_operator      go to state 76
+    term               go to state 77
+    factor             go to state 78
+    variable_access    go to state 79
+    constant           go to state 80
+
+
 state 104
 
-   55 expression: simple_expression opt_relational_operator_simple_expression .
+   66 simple_expression: sign_operator term . star_adding_operator_term
 
-    $default  reduce using rule 55 (expression)
+    T_PLUS   shift, and go to state 105
+    T_MINUS  shift, and go to state 106
+    T_OR     shift, and go to state 107
+
+    $default  reduce using rule 70 (star_adding_operator_term)
+
+    star_adding_operator_term  go to state 132
+    adding_operator            go to state 109
 
 
 state 105
 
-   57 opt_relational_operator_simple_expression: relational_operator . simple_expression
-
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_PLUS           shift, and go to state 74
-    T_MINUS          shift, and go to state 75
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
-
-    simple_expression  go to state 129
-    sign_operator      go to state 80
-    term               go to state 81
-    factor             go to state 82
-    variable_access    go to state 83
-    constant           go to state 84
-
-
-state 106
-
-   64 simple_expression: sign_operator term . star_adding_operator_term
-
-    T_PLUS   shift, and go to state 107
-    T_MINUS  shift, and go to state 108
-    T_OR     shift, and go to state 109
-
-    $default  reduce using rule 68 (star_adding_operator_term)
-
-    star_adding_operator_term  go to state 130
-    adding_operator            go to state 111
-
-
-state 107
-
-   70 adding_operator: T_PLUS .
-
-    $default  reduce using rule 70 (adding_operator)
-
-
-state 108
-
-   71 adding_operator: T_MINUS .
-
-    $default  reduce using rule 71 (adding_operator)
-
-
-state 109
-
-   72 adding_operator: T_OR .
+   72 adding_operator: T_PLUS .
 
     $default  reduce using rule 72 (adding_operator)
 
 
+state 106
+
+   73 adding_operator: T_MINUS .
+
+    $default  reduce using rule 73 (adding_operator)
+
+
+state 107
+
+   74 adding_operator: T_OR .
+
+    $default  reduce using rule 74 (adding_operator)
+
+
+state 108
+
+   67 simple_expression: term star_adding_operator_term .
+
+    $default  reduce using rule 67 (simple_expression)
+
+
+state 109
+
+   71 star_adding_operator_term: adding_operator . term star_adding_operator_term
+
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
+
+    term             go to state 133
+    factor           go to state 78
+    variable_access  go to state 79
+    constant         go to state 80
+
+
 state 110
 
-   65 simple_expression: term star_adding_operator_term .
+   78 multiplying_operator: T_TIMES .
 
-    $default  reduce using rule 65 (simple_expression)
+    $default  reduce using rule 78 (multiplying_operator)
 
 
 state 111
 
-   69 star_adding_operator_term: adding_operator . term star_adding_operator_term
+   82 multiplying_operator: T_DIVIDE .
 
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
-
-    term             go to state 131
-    factor           go to state 82
-    variable_access  go to state 83
-    constant         go to state 84
+    $default  reduce using rule 82 (multiplying_operator)
 
 
 state 112
 
-   76 multiplying_operator: T_TIMES .
+   79 multiplying_operator: T_DIV .
 
-    $default  reduce using rule 76 (multiplying_operator)
+    $default  reduce using rule 79 (multiplying_operator)
 
 
 state 113
 
-   80 multiplying_operator: T_DIVIDE .
+   80 multiplying_operator: T_MOD .
 
     $default  reduce using rule 80 (multiplying_operator)
 
 
 state 114
 
-   77 multiplying_operator: T_DIV .
+   81 multiplying_operator: T_AND .
 
-    $default  reduce using rule 77 (multiplying_operator)
+    $default  reduce using rule 81 (multiplying_operator)
 
 
 state 115
 
-   78 multiplying_operator: T_MOD .
+   75 term: factor star_multiplying_operator_factor .
 
-    $default  reduce using rule 78 (multiplying_operator)
+    $default  reduce using rule 75 (term)
 
 
 state 116
 
-   79 multiplying_operator: T_AND .
+   77 star_multiplying_operator_factor: multiplying_operator . factor star_multiplying_operator_factor
 
-    $default  reduce using rule 79 (multiplying_operator)
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
+
+    factor           go to state 134
+    variable_access  go to state 79
+    constant         go to state 80
 
 
 state 117
 
-   73 term: factor star_multiplying_operator_factor .
+   53 while_statement: T_WHILE expression T_DO . statement
 
-    $default  reduce using rule 73 (term)
+    T_ID     shift, and go to state 46
+    T_BEGIN  shift, and go to state 36
+    T_IF     shift, and go to state 47
+    T_WHILE  shift, and go to state 48
+
+    $default  reduce using rule 37 (statement)
+
+    statement             go to state 135
+    assignment_statement  go to state 50
+    procedure_statement   go to state 51
+    if_statement          go to state 52
+    while_statement       go to state 53
+    compound_statement    go to state 54
+    variable_access       go to state 55
 
 
 state 118
 
-   75 star_multiplying_operator_factor: multiplying_operator . factor star_multiplying_operator_factor
+   56 star_comma_statement: T_SEMICOLON statement . star_comma_statement
 
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
+    T_SEMICOLON  shift, and go to state 82
 
-    factor           go to state 132
-    variable_access  go to state 83
-    constant         go to state 84
+    $default  reduce using rule 55 (star_comma_statement)
+
+    star_comma_statement  go to state 136
 
 
 state 119
 
-   51 while_statement: T_WHILE expression T_DO . statement
+   54 compound_statement: T_BEGIN statement star_comma_statement T_END .
 
-    T_ID     shift, and go to state 48
-    T_BEGIN  shift, and go to state 37
-    T_IF     shift, and go to state 49
-    T_WHILE  shift, and go to state 50
-
-    $default  reduce using rule 35 (statement)
-
-    statement             go to state 133
-    assignment_statement  go to state 52
-    procedure_statement   go to state 53
-    if_statement          go to state 54
-    while_statement       go to state 55
-    compound_statement    go to state 56
-    variable_access       go to state 57
+    $default  reduce using rule 54 (compound_statement)
 
 
 state 120
 
-   54 star_comma_statement: T_SEMICOLON statement . star_comma_statement
+   43 assignment_statement: variable_access T_ASSIGN expression .
 
-    T_SEMICOLON  shift, and go to state 86
-
-    $default  reduce using rule 53 (star_comma_statement)
-
-    star_comma_statement  go to state 134
+    $default  reduce using rule 43 (assignment_statement)
 
 
 state 121
 
-   52 compound_statement: T_BEGIN statement star_comma_statement T_END .
+   36 star_comma_id_par: T_COMMA . T_ID star_comma_id_par
 
-    $default  reduce using rule 52 (compound_statement)
+    T_ID  shift, and go to state 137
 
 
 state 122
 
-   41 assignment_statement: variable_access T_ASSIGN expression .
+   34 variable_group_par: T_ID star_comma_id_par . T_COLON type
 
-    $default  reduce using rule 41 (assignment_statement)
+    T_COLON  shift, and go to state 138
 
 
 state 123
 
-   33 star_smc_parameter_definition: T_SEMICOLON parameter_definition . star_smc_parameter_definition
+   29 opt_brc_formal_parameter_list_brc: T_LBRACKET formal_parameter_list T_RBRACKET .
 
-    T_SEMICOLON  shift, and go to state 90
-
-    $default  reduce using rule 32 (star_smc_parameter_definition)
-
-    star_smc_parameter_definition  go to state 135
+    $default  reduce using rule 29 (opt_brc_formal_parameter_list_brc)
 
 
 state 124
 
-   44 opt_brc_actual_parameter_list_brc: T_LBRACKET actual_parameter_list T_RBRACKET .
+   32 star_smc_parameter_definition: T_SEMICOLON . parameter_definition star_smc_parameter_definition
 
-    $default  reduce using rule 44 (opt_brc_actual_parameter_list_brc)
+    T_ID  shift, and go to state 85
+
+    parameter_definition  go to state 139
+    variable_group_par    go to state 88
 
 
 state 125
 
-   47 star_comma_actual_parameter: T_COMMA . actual_parameter star_comma_actual_parameter
+   30 formal_parameter_list: parameter_definition star_smc_parameter_definition .
 
-    T_ID             shift, and go to state 70
-    T_INT_CONST      shift, and go to state 71
-    T_REAL_CONST     shift, and go to state 72
-    T_BOOLEAN_CONST  shift, and go to state 73
-    T_PLUS           shift, and go to state 74
-    T_MINUS          shift, and go to state 75
-    T_NOT            shift, and go to state 76
-    T_LBRACKET       shift, and go to state 77
-
-    actual_parameter   go to state 136
-    expression         go to state 94
-    simple_expression  go to state 79
-    sign_operator      go to state 80
-    term               go to state 81
-    factor             go to state 82
-    variable_access    go to state 83
-    constant           go to state 84
+    $default  reduce using rule 30 (formal_parameter_list)
 
 
 state 126
 
-   45 actual_parameter_list: actual_parameter star_comma_actual_parameter .
+   46 opt_brc_actual_parameter_list_brc: T_LBRACKET actual_parameter_list T_RBRACKET .
 
-    $default  reduce using rule 45 (actual_parameter_list)
+    $default  reduce using rule 46 (opt_brc_actual_parameter_list_brc)
 
 
 state 127
 
-   82 factor: T_LBRACKET expression T_RBRACKET .
+   49 star_comma_actual_parameter: T_COMMA . actual_parameter star_comma_actual_parameter
 
-    $default  reduce using rule 82 (factor)
+    T_ID             shift, and go to state 66
+    T_INT_CONST      shift, and go to state 67
+    T_REAL_CONST     shift, and go to state 68
+    T_BOOLEAN_CONST  shift, and go to state 69
+    T_PLUS           shift, and go to state 70
+    T_MINUS          shift, and go to state 71
+    T_NOT            shift, and go to state 72
+    T_LBRACKET       shift, and go to state 73
+
+    actual_parameter   go to state 140
+    expression         go to state 92
+    simple_expression  go to state 75
+    sign_operator      go to state 76
+    term               go to state 77
+    factor             go to state 78
+    variable_access    go to state 79
+    constant           go to state 80
 
 
 state 128
 
-   49 if_statement: T_IF expression T_THEN statement .
-   50             | T_IF expression T_THEN statement . T_ELSE statement
+   47 actual_parameter_list: actual_parameter star_comma_actual_parameter .
 
-    T_ELSE  shift, and go to state 137
-
-    $default  reduce using rule 49 (if_statement)
+    $default  reduce using rule 47 (actual_parameter_list)
 
 
 state 129
 
-   57 opt_relational_operator_simple_expression: relational_operator simple_expression .
+   84 factor: T_LBRACKET expression T_RBRACKET .
 
-    $default  reduce using rule 57 (opt_relational_operator_simple_expression)
+    $default  reduce using rule 84 (factor)
 
 
 state 130
 
-   64 simple_expression: sign_operator term star_adding_operator_term .
+   51 if_statement: T_IF expression T_THEN statement .
+   52             | T_IF expression T_THEN statement . T_ELSE statement
 
-    $default  reduce using rule 64 (simple_expression)
+    T_ELSE  shift, and go to state 141
+
+    $default  reduce using rule 51 (if_statement)
 
 
 state 131
 
-   69 star_adding_operator_term: adding_operator term . star_adding_operator_term
+   59 opt_relational_operator_simple_expression: relational_operator simple_expression .
 
-    T_PLUS   shift, and go to state 107
-    T_MINUS  shift, and go to state 108
-    T_OR     shift, and go to state 109
-
-    $default  reduce using rule 68 (star_adding_operator_term)
-
-    star_adding_operator_term  go to state 138
-    adding_operator            go to state 111
+    $default  reduce using rule 59 (opt_relational_operator_simple_expression)
 
 
 state 132
 
-   75 star_multiplying_operator_factor: multiplying_operator factor . star_multiplying_operator_factor
+   66 simple_expression: sign_operator term star_adding_operator_term .
 
-    T_TIMES   shift, and go to state 112
-    T_DIVIDE  shift, and go to state 113
-    T_DIV     shift, and go to state 114
-    T_MOD     shift, and go to state 115
-    T_AND     shift, and go to state 116
-
-    $default  reduce using rule 74 (star_multiplying_operator_factor)
-
-    star_multiplying_operator_factor  go to state 139
-    multiplying_operator              go to state 118
+    $default  reduce using rule 66 (simple_expression)
 
 
 state 133
 
-   51 while_statement: T_WHILE expression T_DO statement .
+   71 star_adding_operator_term: adding_operator term . star_adding_operator_term
 
-    $default  reduce using rule 51 (while_statement)
+    T_PLUS   shift, and go to state 105
+    T_MINUS  shift, and go to state 106
+    T_OR     shift, and go to state 107
+
+    $default  reduce using rule 70 (star_adding_operator_term)
+
+    star_adding_operator_term  go to state 142
+    adding_operator            go to state 109
 
 
 state 134
 
-   54 star_comma_statement: T_SEMICOLON statement star_comma_statement .
+   77 star_multiplying_operator_factor: multiplying_operator factor . star_multiplying_operator_factor
 
-    $default  reduce using rule 54 (star_comma_statement)
+    T_TIMES   shift, and go to state 110
+    T_DIVIDE  shift, and go to state 111
+    T_DIV     shift, and go to state 112
+    T_MOD     shift, and go to state 113
+    T_AND     shift, and go to state 114
+
+    $default  reduce using rule 76 (star_multiplying_operator_factor)
+
+    star_multiplying_operator_factor  go to state 143
+    multiplying_operator              go to state 116
 
 
 state 135
 
-   33 star_smc_parameter_definition: T_SEMICOLON parameter_definition star_smc_parameter_definition .
+   53 while_statement: T_WHILE expression T_DO statement .
 
-    $default  reduce using rule 33 (star_smc_parameter_definition)
+    $default  reduce using rule 53 (while_statement)
 
 
 state 136
 
-   47 star_comma_actual_parameter: T_COMMA actual_parameter . star_comma_actual_parameter
+   56 star_comma_statement: T_SEMICOLON statement star_comma_statement .
 
-    T_COMMA  shift, and go to state 125
-
-    $default  reduce using rule 46 (star_comma_actual_parameter)
-
-    star_comma_actual_parameter  go to state 140
+    $default  reduce using rule 56 (star_comma_statement)
 
 
 state 137
 
-   50 if_statement: T_IF expression T_THEN statement T_ELSE . statement
+   36 star_comma_id_par: T_COMMA T_ID . star_comma_id_par
 
-    T_ID     shift, and go to state 48
-    T_BEGIN  shift, and go to state 37
-    T_IF     shift, and go to state 49
-    T_WHILE  shift, and go to state 50
+    T_COMMA  shift, and go to state 121
 
-    $default  reduce using rule 35 (statement)
+    $default  reduce using rule 35 (star_comma_id_par)
 
-    statement             go to state 141
-    assignment_statement  go to state 52
-    procedure_statement   go to state 53
-    if_statement          go to state 54
-    while_statement       go to state 55
-    compound_statement    go to state 56
-    variable_access       go to state 57
+    star_comma_id_par  go to state 144
 
 
 state 138
 
-   69 star_adding_operator_term: adding_operator term star_adding_operator_term .
+   34 variable_group_par: T_ID star_comma_id_par T_COLON . type
 
-    $default  reduce using rule 69 (star_adding_operator_term)
+    T_INTEGER  shift, and go to state 58
+    T_REAL     shift, and go to state 59
+    T_BOOLEAN  shift, and go to state 60
+
+    type  go to state 145
 
 
 state 139
 
-   75 star_multiplying_operator_factor: multiplying_operator factor star_multiplying_operator_factor .
+   32 star_smc_parameter_definition: T_SEMICOLON parameter_definition . star_smc_parameter_definition
 
-    $default  reduce using rule 75 (star_multiplying_operator_factor)
+    T_SEMICOLON  shift, and go to state 124
+
+    $default  reduce using rule 31 (star_smc_parameter_definition)
+
+    star_smc_parameter_definition  go to state 146
 
 
 state 140
 
-   47 star_comma_actual_parameter: T_COMMA actual_parameter star_comma_actual_parameter .
+   49 star_comma_actual_parameter: T_COMMA actual_parameter . star_comma_actual_parameter
 
-    $default  reduce using rule 47 (star_comma_actual_parameter)
+    T_COMMA  shift, and go to state 127
+
+    $default  reduce using rule 48 (star_comma_actual_parameter)
+
+    star_comma_actual_parameter  go to state 147
 
 
 state 141
 
-   50 if_statement: T_IF expression T_THEN statement T_ELSE statement .
+   52 if_statement: T_IF expression T_THEN statement T_ELSE . statement
 
-    $default  reduce using rule 50 (if_statement)
+    T_ID     shift, and go to state 46
+    T_BEGIN  shift, and go to state 36
+    T_IF     shift, and go to state 47
+    T_WHILE  shift, and go to state 48
+
+    $default  reduce using rule 37 (statement)
+
+    statement             go to state 148
+    assignment_statement  go to state 50
+    procedure_statement   go to state 51
+    if_statement          go to state 52
+    while_statement       go to state 53
+    compound_statement    go to state 54
+    variable_access       go to state 55
+
+
+state 142
+
+   71 star_adding_operator_term: adding_operator term star_adding_operator_term .
+
+    $default  reduce using rule 71 (star_adding_operator_term)
+
+
+state 143
+
+   77 star_multiplying_operator_factor: multiplying_operator factor star_multiplying_operator_factor .
+
+    $default  reduce using rule 77 (star_multiplying_operator_factor)
+
+
+state 144
+
+   36 star_comma_id_par: T_COMMA T_ID star_comma_id_par .
+
+    $default  reduce using rule 36 (star_comma_id_par)
+
+
+state 145
+
+   34 variable_group_par: T_ID star_comma_id_par T_COLON type .
+
+    $default  reduce using rule 34 (variable_group_par)
+
+
+state 146
+
+   32 star_smc_parameter_definition: T_SEMICOLON parameter_definition star_smc_parameter_definition .
+
+    $default  reduce using rule 32 (star_smc_parameter_definition)
+
+
+state 147
+
+   49 star_comma_actual_parameter: T_COMMA actual_parameter star_comma_actual_parameter .
+
+    $default  reduce using rule 49 (star_comma_actual_parameter)
+
+
+state 148
+
+   52 if_statement: T_IF expression T_THEN statement T_ELSE statement .
+
+    $default  reduce using rule 52 (if_statement)
