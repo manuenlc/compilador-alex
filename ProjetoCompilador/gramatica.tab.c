@@ -86,6 +86,7 @@ int quantidade_var = 0;
 int var_token2[20];
 bool eh_declaracao_procedure;
 bool eh_procedure_parametro;
+bool uso_de_const;
 bool eh_constante;
 int type_atual;
 int procedure_token2;
@@ -513,16 +514,16 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   103,   103,   107,   112,   118,   119,   122,   123,   127,
-     131,   135,   141,   144,   145,   148,   157,   165,   175,   178,
-     179,   182,   185,   205,   206,   214,   218,   222,   228,   231,
-     234,   241,   251,   278,   281,   282,   285,   288,   301,   302,
-     310,   311,   312,   313,   314,   315,   318,   321,   331,   332,
-     339,   343,   346,   347,   350,   353,   354,   357,   361,   364,
-     365,   368,   371,   372,   375,   376,   377,   378,   379,   380,
-     383,   384,   387,   388,   391,   392,   395,   396,   397,   400,
-     403,   404,   407,   408,   409,   410,   411,   414,   418,   419,
-     422,   443,   444,   445,   446,   446
+       0,   104,   104,   108,   113,   119,   120,   123,   124,   128,
+     132,   136,   142,   145,   146,   149,   158,   166,   176,   179,
+     180,   183,   186,   206,   207,   215,   219,   223,   229,   232,
+     235,   242,   252,   279,   282,   283,   286,   289,   302,   303,
+     311,   312,   313,   314,   315,   316,   319,   326,   336,   337,
+     344,   348,   351,   352,   355,   358,   359,   362,   366,   369,
+     370,   373,   376,   377,   380,   381,   382,   383,   384,   385,
+     388,   389,   392,   393,   396,   397,   400,   401,   402,   405,
+     408,   409,   412,   413,   414,   415,   416,   419,   423,   424,
+     427,   451,   452,   453,   454,   454
 };
 #endif
 
@@ -1557,7 +1558,7 @@ yyreduce:
 
     {
 	eh_declaracao_procedure = false;
-	printf("\nfim de declaracao de procedure\n");
+	//printf("\nfim de declaracao de procedure\n");
 ;}
     break;
 
@@ -1565,7 +1566,7 @@ yyreduce:
 
     {
 	eh_declaracao_procedure = true;
-	printf("\ndeclaracao de procedure\n");
+	//printf("\ndeclaracao de procedure\n");
 ;}
     break;
 
@@ -1726,13 +1727,21 @@ yyreduce:
 ;}
     break;
 
+  case 46:
+
+    {
+	uso_de_const = false;
+	//printf("uso de constante nao eh permitido\n");
+;}
+    break;
+
   case 47:
 
     {
 	if(!search_procedure_on_current_scope_and_bellow((yyvsp[(1) - (2)].token2)))
 	{
 		printf("ERRO: A procedure %s eh utilizada na linha %d mas não foi declarada\n", get_token2_id((yyvsp[(1) - (2)].token2)), get_line());
-		//YYERROR;
+		YYERROR;
 	}
 ;}
     break;
@@ -1826,12 +1835,12 @@ yyreduce:
   case 90:
 
     {
-	if(eh_procedure_parametro)
+	if(eh_procedure_parametro || uso_de_const)
 	{
 		if(!search_parameter_or_var_on_current_scope_and_bellow((yyvsp[(1) - (1)].token2)) && !search_const_on_current_scope_and_bellow((yyvsp[(1) - (1)].token2)))
 		{
 			printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id((yyvsp[(1) - (1)].token2)), get_line());
-			//YYERROR;
+			YYERROR;
 		}
 	}
 	else
@@ -1839,9 +1848,12 @@ yyreduce:
 		{
 			if(eh_constante) printf("ERRO: O simbolo %s eh utilizado como variavel na linha %d mas foi declarado como constante\n", get_token2_id((yyvsp[(1) - (1)].token2)), get_line());
 			else printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id((yyvsp[(1) - (1)].token2)), get_line());
-			//YYERROR;
+			YYERROR;
 		}
 	}
+	
+	uso_de_const = true;
+	//printf("uso de const permitido\n");
 ;}
     break;
 

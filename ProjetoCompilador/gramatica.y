@@ -17,6 +17,7 @@ int quantidade_var = 0;
 int var_token2[20];
 bool eh_declaracao_procedure;
 bool eh_procedure_parametro;
+bool uso_de_const;
 bool eh_constante;
 int type_atual;
 int procedure_token2;
@@ -126,7 +127,7 @@ opt_variable_definition_part:
 star_procedure_definition:
 {
 	eh_declaracao_procedure = false;
-	printf("\nfim de declaracao de procedure\n");
+	//printf("\nfim de declaracao de procedure\n");
 } 
                          | set_procedure_definition procedure_definition star_procedure_definition
 ;
@@ -134,7 +135,7 @@ star_procedure_definition:
 set_procedure_definition :
 {
 	eh_declaracao_procedure = true;
-	printf("\ndeclaracao de procedure\n");
+	//printf("\ndeclaracao de procedure\n");
 } 
 ;
 
@@ -312,10 +313,14 @@ statement:
          | if_statement
          | while_statement
          | compound_statement
-         | assignment_statement
+         | assignment_statement 
 ;
 
 assignment_statement: variable_access T_ASSIGN expression
+{
+	uso_de_const = false;
+	//printf("uso de constante nao eh permitido\n");
+} 
 ;
 
 procedure_statement: T_ID opt_brc_actual_parameter_list_brc
@@ -323,7 +328,7 @@ procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 	if(!search_procedure_on_current_scope_and_bellow($1))
 	{
 		printf("ERRO: A procedure %s eh utilizada na linha %d mas não foi declarada\n", get_token2_id($1), get_line());
-		//YYERROR;
+		YYERROR;
 	}
 }
 ;
@@ -421,12 +426,12 @@ factor: constant
 
 variable_access: T_ID
 {
-	if(eh_procedure_parametro)
+	if(eh_procedure_parametro || uso_de_const)
 	{
 		if(!search_parameter_or_var_on_current_scope_and_bellow($1) && !search_const_on_current_scope_and_bellow($1))
 		{
 			printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
-			//YYERROR;
+			YYERROR;
 		}
 	}
 	else
@@ -434,9 +439,12 @@ variable_access: T_ID
 		{
 			if(eh_constante) printf("ERRO: O simbolo %s eh utilizado como variavel na linha %d mas foi declarado como constante\n", get_token2_id($1), get_line());
 			else printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
-			//YYERROR;
+			YYERROR;
 		}
 	}
+	
+	uso_de_const = true;
+	//printf("uso de const permitido\n");
 }
 ;
 

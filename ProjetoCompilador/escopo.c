@@ -42,12 +42,12 @@ void begin_block()
 	if(altura_escopo < ALTURA_ESCOPO_MAX) largura_escopo[++altura_escopo] = 0;
 	else printf("limite de altura de escopo atingido\n");
 
-	printf("novo escopo %d\n", altura_escopo);
+	//printf("novo escopo %d\n", altura_escopo);
 }
 
 void end_block()
 {
-	printf("eliminando escopo %d\n", altura_escopo);
+	//printf("eliminando escopo %d\n", altura_escopo);
 	if(altura_escopo >= 0) largura_escopo[altura_escopo--] = 0;
 	else printf("nao ha mais escopo para eliminar\n");
 
@@ -160,7 +160,7 @@ bool insert_symbol(simbolo simbolo_a_inserir)
 
 bool insert_var(int token2, int var_tipo)
 {
-	printf("\ntentando inserir uma variavel de token 2: %d e tipo %d ", token2, var_tipo);
+	//printf("\ntentando inserir uma variavel de token 2: %d e tipo %d ", token2, var_tipo);
 	simbolo procurado;
 	procurado.tipo_simbolo = T_VAR;
 	procurado.token1 = var_tipo;
@@ -176,7 +176,7 @@ bool insert_var(int token2, int var_tipo)
 
 bool insert_parameter(int token2, int parametro_tipo)
 {
-	printf("\ntentando inserir um parametro de token 2: %d e tipo %d ", token2, parametro_tipo);
+	//printf("\ntentando inserir um parametro de token 2: %d e tipo %d ", token2, parametro_tipo);
 	simbolo procurado;
 	procurado.tipo_simbolo = T_PARAMETER;
 	procurado.token1 = parametro_tipo;
@@ -191,7 +191,7 @@ bool insert_parameter(int token2, int parametro_tipo)
 
 bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumentos)
 {
-	printf("\ntentando inserir uma procedure de token 2: %d e qtd_args %d ", token2, quantidade_argumentos);
+	//printf("\ntentando inserir uma procedure de token 2: %d e qtd_args %d ", token2, quantidade_argumentos);
 	simbolo procurado;
 	procurado.tipo_simbolo = T_PROCEDURE;
 	procurado.token1 = T_PROCEDURE;
@@ -203,10 +203,10 @@ bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumento
 		int i;
 		for(i = 0; i < quantidade_argumentos; ++i)
 		{
-			printf("arg tk2: %d | ", tipo_argumentos[i]);
+			//printf("arg tk2: %d | ", tipo_argumentos[i]);
 			procurado.tipo_argumentos[i] = tipo_argumentos[i];
 		}
-		printf("\n");
+		//printf("\n");
 	}
 
 	bool achou = search_token2_on_current_scope(token2);
@@ -217,7 +217,7 @@ bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumento
 
 bool insert_const(int token2, int const_tipo)
 {
-	printf("\ntentando inserir uma constante de token 2: %d ", token2);
+	//printf("\ntentando inserir uma constante de token 2: %d ", token2);
 	simbolo procurado;
 	procurado.tipo_simbolo = T_CONST;
 	procurado.token1 = const_tipo;
