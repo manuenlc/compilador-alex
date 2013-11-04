@@ -19,7 +19,9 @@ int largura_escopo[LARGURA_ESCOPO_MAX];
 void begin_block();
 void end_block();
 bool search_token2_on_current_scope(int token2);
-bool search_token2_on_current_scope_and_bellow(int token2);
+bool search_parameter_or_var_on_current_scope_and_bellow(int token2);
+bool search_procedure_on_current_scope_and_bellow(int token2);
+bool search_const_on_current_scope_and_bellow(int token2);
 bool search_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado);
 bool insert_var(int token2, int var_tipo);
 bool insert_parameter(int token2, int parametro_tipo);
@@ -77,13 +79,41 @@ bool search_token2_on_current_scope(int token2)
 	return false;
 }
 
-bool search_token2_on_current_scope_and_bellow(int token2)
+bool search_procedure_on_current_scope_and_bellow(int token2)
 {
 	int i, j;
 
 	for(i = altura_escopo; i >= 0 ; --i)
 		for(j = 0; j < largura_escopo[i]; ++j)
-			if(escopo[i][j].token2 == token2) return true;
+			if(escopo[i][j].token2 == token2 && escopo[i][j].tipo_simbolo == T_PROCEDURE)
+				return true;
+
+	return false;
+}
+
+bool search_const_on_current_scope_and_bellow(int token2)
+{
+	{
+		int i, j;
+
+		for(i = altura_escopo; i >= 0 ; --i)
+			for(j = 0; j < largura_escopo[i]; ++j)
+				if(escopo[i][j].token2 == token2 && escopo[i][j].tipo_simbolo == T_CONST)
+					return true;
+
+		return false;
+	}
+}
+
+bool search_parameter_or_var_on_current_scope_and_bellow(int token2)
+{
+	int i, j;
+
+	for(i = altura_escopo; i >= 0 ; --i)
+		for(j = 0; j < largura_escopo[i]; ++j)
+			if(escopo[i][j].token2 == token2 &&
+					(escopo[i][j].tipo_simbolo == T_PARAMETER || escopo[i][j].tipo_simbolo == T_VAR))
+				return true;
 
 	return false;
 }

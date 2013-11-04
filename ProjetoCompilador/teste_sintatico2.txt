@@ -9,7 +9,7 @@ program HelloWorld;
         h, i : real;
 		
 
-   (* procedure ProcedureWithNoParams ;
+   procedure ProcedureWithNoParams ;
         const
             a = 3;
             b = 2.;
@@ -24,7 +24,7 @@ program HelloWorld;
             e := a + 2
         end;
     end;
-    *)
+    
     procedure ProcedureWithParams(a, b, c : integer; d, e, f : real);
     begin
         f := f or a

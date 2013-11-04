@@ -33,7 +33,9 @@ void end_block();
 /** retorna true (1) se achou o simbolo no escopo atual
  *  retorna false (0) caso contrário*/
 bool search_token2_on_current_scope(int token2);
-bool search_token2_on_current_scope_and_bellow(int token2);
+bool search_parameter_or_var_on_current_scope_and_bellow(int token2);
+bool search_procedure_on_current_scope_and_bellow(int token2);
+bool search_const_on_current_scope_and_bellow(int token2);
 bool search_symbol_on_current_scope_and_bellow(simbolo simbolo_procurado);
 
 /** retorna true (1) se o simbolo foi adicionado no escopo atual

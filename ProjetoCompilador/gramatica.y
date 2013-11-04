@@ -16,6 +16,7 @@ int quantidade_arg_adicionados = 0;
 int quantidade_var = 0;
 int var_token2[20];
 bool eh_declaracao_procedure;
+bool eh_procedure_parametro;
 int type_atual;
 int procedure_token2;
 
@@ -318,7 +319,7 @@ assignment_statement: variable_access T_ASSIGN expression
 
 procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 {
-	if(!search_token2_on_current_scope_and_bellow($1))
+	if(!search_procedure_on_current_scope_and_bellow($1))
 	{
 		printf("ERRO: A procedure %s eh utilizada na linha %d mas não foi declarada\n", get_token2_id($1), get_line());
 		//YYERROR;
@@ -327,8 +328,18 @@ procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 ;
 
 opt_brc_actual_parameter_list_brc:
-                                 | T_LBRACKET actual_parameter_list T_RBRACKET
+                                 | T_LBRACKET set_procedure_par actual_parameter_list T_RBRACKET
+{
+	eh_procedure_parametro = false;
+	printf("nao mais lendo parametros...\n");
+}
 ;
+
+set_procedure_par:
+{
+	eh_procedure_parametro = true;
+	printf("lendo parametros...\n");
+}
 
 actual_parameter_list: actual_parameter star_comma_actual_parameter
 ;
@@ -408,11 +419,20 @@ factor: constant
 
 variable_access: T_ID
 {
-	
-	if(!search_token2_on_current_scope_and_bellow($1))
+	if(eh_procedure_parametro)
 	{
-		printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
-		//YYERROR;
+		if(!search_parameter_or_var_on_current_scope_and_bellow($1) && !search_const_on_current_scope_and_bellow($1))
+		{
+			printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
+			//YYERROR;
+		}
+	}
+	else
+	{	if(!search_parameter_or_var_on_current_scope_and_bellow($1))
+		{
+			printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
+			//YYERROR;
+		}
 	}
 }
 ;
