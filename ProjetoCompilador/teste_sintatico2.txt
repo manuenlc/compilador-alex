@@ -33,12 +33,12 @@ program HelloWorld;
 begin
     procedureWithParams(1 + a * 2, b, c, c, c, b);
     if x = 2 then 
-        procedureWithNoParams
+        procedureWithNoParams2
     else
     begin
         x := 3;
     end;
-    x := 2;
+    a := 2;
     y := 3
     { no ";" is required after the last statement of a block - 
     adding one adds a "null statement" to the program }

@@ -17,6 +17,7 @@ int quantidade_var = 0;
 int var_token2[20];
 bool eh_declaracao_procedure;
 bool eh_procedure_parametro;
+bool eh_constante;
 int type_atual;
 int procedure_token2;
 
@@ -331,14 +332,12 @@ opt_brc_actual_parameter_list_brc:
                                  | T_LBRACKET set_procedure_par actual_parameter_list T_RBRACKET
 {
 	eh_procedure_parametro = false;
-	printf("nao mais lendo parametros...\n");
 }
 ;
 
 set_procedure_par:
 {
 	eh_procedure_parametro = true;
-	printf("lendo parametros...\n");
 }
 
 actual_parameter_list: actual_parameter star_comma_actual_parameter
@@ -413,6 +412,9 @@ multiplying_operator: T_TIMES  { $$ = T_TIMES;  }
 ;
 
 factor: constant
+{
+	eh_constante = true;
+}
       | T_LBRACKET expression T_RBRACKET
       | T_NOT factor
 ;
@@ -430,7 +432,8 @@ variable_access: T_ID
 	else
 	{	if(!search_parameter_or_var_on_current_scope_and_bellow($1))
 		{
-			printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
+			if(eh_constante) printf("ERRO: O simbolo %s eh utilizado como variavel na linha %d mas foi declarado como constante\n", get_token2_id($1), get_line());
+			else printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
 			//YYERROR;
 		}
 	}
@@ -440,6 +443,6 @@ variable_access: T_ID
 constant: T_INT_CONST
         | T_REAL_CONST
         | T_BOOLEAN_CONST
-        | variable_access
+        | { eh_constante = false; } variable_access
 ;
 %%
