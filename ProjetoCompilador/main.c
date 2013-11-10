@@ -14,6 +14,7 @@
 #include "boolean.h"
 #include "lexico.h"
 
+#include "tipo.h"
 #include "gramatica.tab.h"
 
 extern int yyparse(void);

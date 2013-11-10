@@ -2,12 +2,11 @@
 
 #include "lexico.h"
 #include "tokens.h"
-#include "escopo.h"
 #include "gramatica.tab.h"
 #include "boolean.h"
 
-extern int yylex(void);
 extern int yyerror(char*);
+extern int yylex(void);
 
 int quantidade_arg = 0;
 int arg_token2[20];
@@ -18,12 +17,18 @@ int var_token2[20];
 bool eh_declaracao_procedure;
 bool eh_procedure_parametro;
 bool uso_de_const;
-bool eh_constante;
+
+int tipo_constante;
 int type_atual;
 int procedure_token2;
 
-
 %}
+
+%code requires 
+{
+#include "escopo.h"
+#include "tipo.h"
+}
 
 %union 
 {
@@ -33,6 +38,9 @@ int procedure_token2;
 	char token_valor_id[64];
     float token_valor_real;
     int token_valor_boolean;
+    
+    //struct simbolo simbolo_info;
+    struct expressao expressao_info;
 }
 
 %token T_EOF                  0
@@ -92,7 +100,8 @@ int procedure_token2;
 
 %right T_THEN T_ELSE
 
-%type<token1> type relational_operator sign_operator multiplying_operator
+%type<token1> type constant variable_access factor adding_operator term multiplying_operator relational_operator
+%type<expressao_info> star_multiplying_operator_factor expression
 %type<token2> T_ID  
 %type<token_valor_real> T_REAL_CONST
 %type<token_valor_int> T_INT_CONST
@@ -127,7 +136,7 @@ opt_variable_definition_part:
 star_procedure_definition:
 {
 	eh_declaracao_procedure = false;
-	//printf("\nfim de declaracao de procedure\n");
+	printf("\nfim de declaracao de procedure\n");
 } 
                          | set_procedure_definition procedure_definition star_procedure_definition
 ;
@@ -135,7 +144,7 @@ star_procedure_definition:
 set_procedure_definition :
 {
 	eh_declaracao_procedure = true;
-	//printf("\ndeclaracao de procedure\n");
+	printf("\ndeclaracao de procedure\n");
 } 
 ;
 
@@ -151,7 +160,7 @@ constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 		 
 		if(!insert_const($1, T_INTEGER))
 		{
-			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
+			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id($1), get_line());
 			YYERROR;
 		}		
 }
@@ -159,7 +168,7 @@ constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 {	
 		if(!insert_const($1, T_REAL))
 		{
-			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
+			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id($1), get_line());
 			YYERROR;
 		}		
 } 
@@ -167,7 +176,7 @@ constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 {		
 		if(!insert_const($1, T_BOOLEAN))
 		{
-			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id($1), get_line());
+			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id($1), get_line());
 			YYERROR;
 		}
 }
@@ -195,7 +204,7 @@ variable_group: T_ID star_comma_id T_COLON type
 	{
 		if(!insert_var(var_token2[i], $4))
 		{
-			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(var_token2[i]), get_line());
+			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(var_token2[i]), get_line());
 			YYERROR;
 		}
 	}
@@ -242,7 +251,7 @@ opt_brc_formal_parameter_list_brc:
 {
 	if(!insert_procedure(procedure_token2, 0 , NULL))
 	{
-		printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(procedure_token2), get_line());
+		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(procedure_token2), get_line());
 		YYERROR;
 	}
 	
@@ -254,7 +263,7 @@ opt_brc_formal_parameter_list_brc:
 
 	if(!insert_procedure(procedure_token2, quantidade_arg_adicionados, arg_token2))
 	{
-		printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(procedure_token2), get_line());
+		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(procedure_token2), get_line());
 		YYERROR;
 	}
 	
@@ -267,7 +276,7 @@ opt_brc_formal_parameter_list_brc:
 		
 		if(!insert_parameter(arg_token2[i], arg_token1[i]))
 		{
-			printf("ERRO: Redefinicao do simbolo %s na linha %d", get_token2_id(arg_token2[i]), get_line());
+			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(arg_token2[i]), get_line());
 			YYERROR;
 		}
 	}
@@ -318,8 +327,8 @@ statement:
 
 assignment_statement: variable_access T_ASSIGN expression
 {
-	uso_de_const = false;
-	//printf("uso de constante nao eh permitido\n");
+	uso_de_const = false; // uso de constante no lado direito não é permitido;
+	printf("uso de const nao eh permitido\n");
 } 
 ;
 
@@ -371,6 +380,9 @@ star_comma_statement:
 ;
 
 expression: simple_expression opt_relational_operator_simple_expression
+{
+
+}
 ;
 
 opt_relational_operator_simple_expression: 
@@ -389,24 +401,63 @@ simple_expression: sign_operator term star_adding_operator_term
                  | term star_adding_operator_term
 ;
 
-sign_operator: T_PLUS { $$ = T_PLUS; }
-             | T_MINUS { $$ = T_MINUS; }
+sign_operator: T_PLUS
+             | T_MINUS 
 ;
 
 star_adding_operator_term:
                          | adding_operator term star_adding_operator_term
 ;
 
-adding_operator: T_PLUS
-               | T_MINUS
-               | T_OR
+adding_operator: T_PLUS 	{$$ = T_PLUS; }
+               | T_MINUS 	{$$ = T_MINUS; }
+               | T_OR 		{$$ = T_OR; }
 ;
 
 term: factor star_multiplying_operator_factor
+{
+	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
+	
+	printf("resultado da operacao: %d\n", tipo_resultado);
+		
+	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
+}
 ;
 
 star_multiplying_operator_factor:
+{
+	$$.tipo_operando1 = T_EOF;
+	$$.operacao = T_EOF;
+	
+	{printf("#");} 
+}
                                 | multiplying_operator factor star_multiplying_operator_factor
+{
+	printf("$");
+	
+	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
+
+	printf("resultado da operacao: %d\n", tipo_resultado);
+	
+	if(tipo_resultado != T_INVALID)
+	{
+		$$.tipo_operando1 = tipo_resultado;
+		$$.operacao = $1;
+	}
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
+	
+	printf("$");
+	
+}
 ;
 
 multiplying_operator: T_TIMES  { $$ = T_TIMES;  } 
@@ -418,20 +469,58 @@ multiplying_operator: T_TIMES  { $$ = T_TIMES;  }
 
 factor: constant
 {
-	eh_constante = true;
+	$$ = $1;
 }
       | T_LBRACKET expression T_RBRACKET
+{
+	int tipo_resultado = result_type($2.tipo_operando1, $2.tipo_operando2, $2.operacao);
+	
+	printf("resultado da operacao: %d\n", tipo_resultado);
+	
+	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
+}
       | T_NOT factor
+{
+	if($2 != T_BOOLEAN_CONST)
+	{
+		printf("ERRO: utilizacao incorreta de 'not' na linha %d", get_line());
+		//YYERROR;
+	}
+}
 ;
 
 variable_access: T_ID
 {
+	printf("chamou var_acess. tipo var e %d\n", $$);
+	bool eh_constante;
+	
+	switch($$)
+	{
+	case T_INT_CONST:
+	case T_REAL_CONST:
+	case T_BOOLEAN_CONST:
+		eh_constante = true;
+	default:
+		eh_constante = false;
+	}
+	
 	if(eh_procedure_parametro || uso_de_const)
 	{
 		if(!search_parameter_or_var_on_current_scope_and_bellow($1) && !search_const_on_current_scope_and_bellow($1))
 		{
 			printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
 			YYERROR;
+		}
+		else
+		{
+			$$ = get_token_type($1);
+			printf("setando var_acess: %d\n", $$);
+			
 		}
 	}
 	else
@@ -441,16 +530,37 @@ variable_access: T_ID
 			else printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
 			YYERROR;
 		}
+		else
+		{
+			$$ = get_token_type($1);
+			printf("setando var_acess: %d\n", $$);
+		}
 	}
 	
 	uso_de_const = true;
-	//printf("uso de const permitido\n");
+	printf("uso de const permitido\n");
 }
 ;
 
 constant: T_INT_CONST
+{
+	$$ = T_INT_CONST;
+	printf("chamado int_cont\n");
+}
         | T_REAL_CONST
+{
+	$$ = T_REAL_CONST;
+	printf("chamado real_cont\n");
+}
         | T_BOOLEAN_CONST
-        | { eh_constante = false; } variable_access
+{
+	$$ = T_BOOLEAN_CONST;
+	printf("chamado bool_cont\n");
+}
+        | variable_access
+{
+	$$ = $1;
+	printf("pode ser var_id ou procedure_id. var_acess %d\n", $1);
+}
 ;
 %%

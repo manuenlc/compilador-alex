@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "escopo.h"
+#include "tipo.h"
 #include "gramatica.tab.h"
 #include "tokens.h"
 
@@ -35,6 +36,17 @@ bool insert_symbol(simbolo simbolo_a_inserir);
 
 void print_scopes();
 void print_current_scope();
+
+int get_token_type(int token2)
+{
+	int i, j;
+
+	for(i = altura_escopo; i >= 0 ; --i)
+		for(j = 0; j < largura_escopo[i]; ++j)
+			if(escopo[i][j].token2 == token2) return escopo[i][j].token1;
+
+	return T_INVALID;
+}
 
 
 void begin_block()

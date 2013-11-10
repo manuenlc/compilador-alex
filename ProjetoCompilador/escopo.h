@@ -23,7 +23,7 @@ typedef struct simbolo
 	int token2;
 
 	int quantidade_parametros; //para procedures
-	int tipo_argumentos[QTD_MAX_PARAMETROS]; //token 1 do tipo de parametro
+	int tipo_argumentos[20]; //token 1 do tipo de parametro
 
 } simbolo;
 
@@ -47,5 +47,8 @@ bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumento
 bool insert_const(int token2, int const_tipo);
 
 void print_current_scope();
+
+/** retorna o tipo associado a um token_id*/
+int get_token_type(int token2);
 
 #endif /* ESCOPO_H_ */

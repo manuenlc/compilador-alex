@@ -32,6 +32,14 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+/* "%code requires" blocks.  */
+
+
+#include "escopo.h"
+#include "tipo.h"
+
+
+
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -106,6 +114,9 @@ typedef union YYSTYPE
 	char token_valor_id[64];
     float token_valor_real;
     int token_valor_boolean;
+    
+    //struct simbolo simbolo_info;
+    struct expressao expressao_info;
 
 
 

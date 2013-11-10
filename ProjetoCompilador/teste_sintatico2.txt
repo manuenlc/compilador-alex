@@ -6,7 +6,7 @@ program HelloWorld;
 		a = 4;
     var
         e, f, g, x, y : (* yes, they are integers *) integer;
-        h, i : real;
+        h, z2, i : real;
 		
 
    procedure ProcedureWithNoParams ;
@@ -19,26 +19,26 @@ program HelloWorld;
             e, f, g : integer;
             h, i : real;
     begin
-        while e mod 3 <> 2 do
+        while 1 mod 3 <> 2 do
         begin
-            e := a + 2
+            e := 1*3 + 2*1.3
         end;
     end;
     
-    procedure ProcedureWithParams(a, b, c : integer; d, e, f : real);
+    procedure procedureWithParams(a, b, c : integer; d, e, f : real);
     begin
-        f := f or a
+        f := f or 2
     end;
 
 begin
-    procedureWithParams(1 + a * 2, b, c, c, c, b);
+    procedureWithParams(1 + a * 2 + x, b, c, 1, c, b,1);
     if x = 2 then 
-        procedureWithNoParams2
+        procedureWithNoParams
     else
     begin
-        x := 3;
+        x := 3.8;
     end;
-    a := 2;
+    x := 2 + (a + 1);
     y := 3
     { no ";" is required after the last statement of a block - 
     adding one adds a "null statement" to the program }

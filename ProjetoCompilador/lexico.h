@@ -38,6 +38,7 @@ int get_line();
 /** retorna a string associada ao token2 de um YYSTYPE */
 char *get_token2_id(int token2);
 
+
 /** funções geradas pelo bison */
 int yylex(void);
 int yyerror(char* error_description);
