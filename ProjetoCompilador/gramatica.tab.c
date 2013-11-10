@@ -530,10 +530,10 @@ static const yytype_uint16 yyrline[] =
      244,   251,   261,   288,   291,   292,   295,   298,   311,   312,
      320,   321,   322,   323,   324,   325,   328,   335,   345,   346,
      353,   357,   360,   361,   364,   367,   368,   371,   375,   378,
-     379,   382,   388,   389,   392,   393,   394,   395,   396,   397,
-     400,   401,   404,   405,   408,   409,   412,   413,   414,   417,
-     433,   439,   463,   464,   465,   466,   467,   470,   474,   487,
-     497,   545,   550,   555,   560
+     379,   382,   401,   406,   420,   421,   422,   423,   424,   425,
+     428,   443,   460,   461,   465,   470,   493,   494,   495,   498,
+     514,   520,   544,   545,   546,   547,   548,   551,   555,   566,
+     576,   624,   629,   634,   639
 };
 #endif
 
@@ -1775,7 +1775,43 @@ yyreduce:
   case 61:
 
     {
+	printf("relational\n");
+	
+	int tipo_resultado = result_type((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	
+	printf("resultado da operacao: %d\n", tipo_resultado);
+		
+	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
 
+;}
+    break;
+
+  case 62:
+
+    {
+	printf("relational#");
+	(yyval.expressao_info).tipo_operando1 = T_EOF;
+	(yyval.expressao_info).operacao = T_EOF;	
+;}
+    break;
+
+  case 63:
+
+    {
+	printf("relational#2\n");
+	(yyval.expressao_info).tipo_operando1 = (yyvsp[(2) - (2)].token1);
+	(yyval.expressao_info).operacao = (yyvsp[(1) - (2)].token1);
+		
+	if((yyvsp[(1) - (2)].token1) == T_INVALID || (yyvsp[(2) - (2)].token1) == T_INVALID)
+	{
+		printf("ERRO: Operando ou operacao invalido\n");
+		//YYERROR;
+	}
 ;}
     break;
 
@@ -1807,6 +1843,75 @@ yyreduce:
   case 69:
 
     { (yyval.token1) = T_GEQ; ;}
+    break;
+
+  case 70:
+
+    {
+	printf("++1");
+	
+	int tipo_resultado = result_type((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
+	
+	printf("resultado da operacao: %d\n", tipo_resultado);
+		
+	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
+;}
+    break;
+
+  case 71:
+
+    {
+	printf("++2");
+	
+	int tipo_resultado = result_type((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	
+	printf("resultado da operacao: %d\n", tipo_resultado);
+		
+	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
+;}
+    break;
+
+  case 74:
+
+    {
+	printf("#+2");
+	(yyval.expressao_info).tipo_operando1 = T_EOF;
+	(yyval.expressao_info).operacao = T_EOF;
+;}
+    break;
+
+  case 75:
+
+    {
+	printf("+2");
+	
+	int tipo_resultado = result_type((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
+
+	printf("resultado da operacao: %d\n", tipo_resultado);
+	
+	if(tipo_resultado != T_INVALID)
+	{
+		(yyval.expressao_info).tipo_operando1 = tipo_resultado;
+		(yyval.expressao_info).operacao = (yyvsp[(1) - (3)].token1);
+	}
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
+	
+	printf("@");
+;}
     break;
 
   case 76:
@@ -1846,14 +1951,14 @@ yyreduce:
 	(yyval.expressao_info).tipo_operando1 = T_EOF;
 	(yyval.expressao_info).operacao = T_EOF;
 	
-	{printf("#");} 
+	{printf("*1");} 
 ;}
     break;
 
   case 81:
 
     {
-	printf("$");
+	printf("*2");
 	
 	int tipo_resultado = result_type((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
 
@@ -1870,7 +1975,7 @@ yyreduce:
 		//YYERROR;
 	}
 	
-	printf("$");
+	printf("*2");
 	
 ;}
     break;
@@ -1910,11 +2015,9 @@ yyreduce:
   case 88:
 
     {
-	int tipo_resultado = result_type((yyvsp[(2) - (3)].expressao_info).tipo_operando1, (yyvsp[(2) - (3)].expressao_info).tipo_operando2, (yyvsp[(2) - (3)].expressao_info).operacao);
+	printf("(%d)\n", (yyvsp[(2) - (3)].token1));
 	
-	printf("resultado da operacao: %d\n", tipo_resultado);
-	
-	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
+	if((yyvsp[(2) - (3)].token1) != T_INVALID) (yyval.token1) = (yyvsp[(2) - (3)].token1);
 	else
 	{
 		printf("ERRO: Operacao invalida\n");
@@ -1937,7 +2040,7 @@ yyreduce:
   case 90:
 
     {
-	printf("chamou var_acess. tipo var e %d\n", (yyval.token1));
+	printf("chamou var_acess. id %s\n", get_token2_id((yyvsp[(1) - (1)].token2)));
 	bool eh_constante;
 	
 	switch((yyval.token1))

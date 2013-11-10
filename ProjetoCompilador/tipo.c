@@ -78,11 +78,11 @@ int result_type(int operando1, int operando2, int operacao)
 			/* no break */
 		case T_INTEGER:
 		case T_INT_CONST:
-			if(operando2 == T_INTEGER || operando2 == T_INT_CONST ) return T_INTEGER;
+			if(operando2 == T_INTEGER || operando2 == T_INT_CONST ) return T_BOOLEAN;
 			else return T_INVALID;
 		case T_REAL:
 		case T_REAL_CONST:
-			if(operando2 == T_REAL || operando2 == T_REAL_CONST ) return T_REAL;
+			if(operando2 == T_REAL || operando2 == T_REAL_CONST ) return T_BOOLEAN;
 			else return T_INVALID;
 		default:
 			return T_INVALID;

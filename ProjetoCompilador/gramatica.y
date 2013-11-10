@@ -100,8 +100,8 @@ int procedure_token2;
 
 %right T_THEN T_ELSE
 
-%type<token1> type constant variable_access factor adding_operator term multiplying_operator relational_operator
-%type<expressao_info> star_multiplying_operator_factor expression
+%type<token1> type constant variable_access factor adding_operator term multiplying_operator relational_operator simple_expression expression
+%type<expressao_info> star_multiplying_operator_factor star_adding_operator_term opt_relational_operator_simple_expression
 %type<token2> T_ID  
 %type<token_valor_real> T_REAL_CONST
 %type<token_valor_int> T_INT_CONST
@@ -381,12 +381,40 @@ star_comma_statement:
 
 expression: simple_expression opt_relational_operator_simple_expression
 {
+	printf("relational\n");
+	
+	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
+	
+	printf("resultado da operacao: %d\n", tipo_resultado);
+		
+	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
 
 }
 ;
 
-opt_relational_operator_simple_expression: 
+opt_relational_operator_simple_expression:
+{
+	printf("relational#");
+	$$.tipo_operando1 = T_EOF;
+	$$.operacao = T_EOF;	
+}
                                          | relational_operator simple_expression
+{
+	printf("relational#2\n");
+	$$.tipo_operando1 = $2;
+	$$.operacao = $1;
+		
+	if($1 == T_INVALID || $2 == T_INVALID)
+	{
+		printf("ERRO: Operando ou operacao invalido\n");
+		//YYERROR;
+	}
+}
 ;
 
 relational_operator: T_LT  { $$ = T_LT;  }
@@ -398,7 +426,35 @@ relational_operator: T_LT  { $$ = T_LT;  }
 ;
 
 simple_expression: sign_operator term star_adding_operator_term
+{
+	printf("++1");
+	
+	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
+	
+	printf("resultado da operacao: %d\n", tipo_resultado);
+		
+	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
+}
                  | term star_adding_operator_term
+{
+	printf("++2");
+	
+	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
+	
+	printf("resultado da operacao: %d\n", tipo_resultado);
+		
+	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
+}
 ;
 
 sign_operator: T_PLUS
@@ -406,7 +462,32 @@ sign_operator: T_PLUS
 ;
 
 star_adding_operator_term:
+{
+	printf("#+2");
+	$$.tipo_operando1 = T_EOF;
+	$$.operacao = T_EOF;
+}
                          | adding_operator term star_adding_operator_term
+{
+	printf("+2");
+	
+	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
+
+	printf("resultado da operacao: %d\n", tipo_resultado);
+	
+	if(tipo_resultado != T_INVALID)
+	{
+		$$.tipo_operando1 = tipo_resultado;
+		$$.operacao = $1;
+	}
+	else
+	{
+		printf("ERRO: Operacao invalida\n");
+		//YYERROR;
+	}
+	
+	printf("@");
+}
 ;
 
 adding_operator: T_PLUS 	{$$ = T_PLUS; }
@@ -434,11 +515,11 @@ star_multiplying_operator_factor:
 	$$.tipo_operando1 = T_EOF;
 	$$.operacao = T_EOF;
 	
-	{printf("#");} 
+	{printf("*1");} 
 }
                                 | multiplying_operator factor star_multiplying_operator_factor
 {
-	printf("$");
+	printf("*2");
 	
 	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
 
@@ -455,7 +536,7 @@ star_multiplying_operator_factor:
 		//YYERROR;
 	}
 	
-	printf("$");
+	printf("*2");
 	
 }
 ;
@@ -473,11 +554,9 @@ factor: constant
 }
       | T_LBRACKET expression T_RBRACKET
 {
-	int tipo_resultado = result_type($2.tipo_operando1, $2.tipo_operando2, $2.operacao);
+	printf("(%d)\n", $2);
 	
-	printf("resultado da operacao: %d\n", tipo_resultado);
-	
-	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
+	if($2 != T_INVALID) $$ = $2;
 	else
 	{
 		printf("ERRO: Operacao invalida\n");
@@ -496,7 +575,7 @@ factor: constant
 
 variable_access: T_ID
 {
-	printf("chamou var_acess. tipo var e %d\n", $$);
+	printf("chamou var_acess. id %s\n", get_token2_id($1));
 	bool eh_constante;
 	
 	switch($$)
