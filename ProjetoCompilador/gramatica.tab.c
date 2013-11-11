@@ -528,12 +528,12 @@ static const yytype_uint16 yyrline[] =
      141,   145,   151,   154,   155,   158,   167,   175,   185,   188,
      189,   192,   195,   215,   216,   224,   228,   232,   238,   241,
      244,   251,   261,   288,   291,   292,   295,   298,   311,   312,
-     320,   321,   322,   323,   324,   325,   328,   335,   345,   346,
-     353,   357,   360,   361,   364,   367,   368,   371,   375,   378,
-     379,   382,   401,   406,   420,   421,   422,   423,   424,   425,
-     428,   443,   460,   461,   465,   470,   493,   494,   495,   498,
-     514,   520,   544,   545,   546,   547,   548,   551,   555,   566,
-     576,   624,   629,   634,   639
+     320,   321,   322,   323,   324,   325,   328,   345,   355,   356,
+     363,   367,   370,   371,   374,   377,   378,   381,   385,   388,
+     389,   392,   411,   416,   430,   431,   432,   433,   434,   435,
+     438,   453,   470,   471,   475,   480,   503,   504,   505,   508,
+     524,   530,   554,   555,   556,   557,   558,   561,   565,   576,
+     591,   639,   644,   649,   654
 };
 #endif
 
@@ -1742,8 +1742,18 @@ yyreduce:
   case 46:
 
     {
+	printf("assignment check: %d %d\n", (yyvsp[(1) - (3)].token1), (yyvsp[(3) - (3)].token1));
+	
+	if(!check_assignment((yyvsp[(1) - (3)].token1), (yyvsp[(3) - (3)].token1)))
+	{
+		printf("ERRO: Nao eh possivel atribuir um %s a um %s na linha %d\n", get_type_name((yyvsp[(3) - (3)].token1)), get_type_name((yyvsp[(1) - (3)].token1)), get_line());
+		//YYERROR;
+	}
+	
 	uso_de_const = false; // uso de constante no lado direito não é permitido;
 	printf("uso de const nao eh permitido\n");
+	
+	
 ;}
     break;
 
@@ -1784,7 +1794,7 @@ yyreduce:
 	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 
@@ -1809,7 +1819,7 @@ yyreduce:
 		
 	if((yyvsp[(1) - (2)].token1) == T_INVALID || (yyvsp[(2) - (2)].token1) == T_INVALID)
 	{
-		printf("ERRO: Operando ou operacao invalido\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 ;}
@@ -1857,7 +1867,7 @@ yyreduce:
 	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 ;}
@@ -1875,7 +1885,7 @@ yyreduce:
 	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 ;}
@@ -1906,7 +1916,7 @@ yyreduce:
 	}
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 	
@@ -1939,7 +1949,7 @@ yyreduce:
 	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 ;}
@@ -1971,7 +1981,7 @@ yyreduce:
 	}
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 	
@@ -2020,7 +2030,7 @@ yyreduce:
 	if((yyvsp[(2) - (3)].token1) != T_INVALID) (yyval.token1) = (yyvsp[(2) - (3)].token1);
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 ;}
@@ -2029,7 +2039,12 @@ yyreduce:
   case 89:
 
     {
-	if((yyvsp[(2) - (2)].token1) != T_BOOLEAN_CONST)
+	if((yyvsp[(2) - (2)].token1) == T_BOOLEAN_CONST || (yyvsp[(2) - (2)].token1) == T_BOOLEAN)
+	{
+		(yyval.token1) = (yyvsp[(2) - (2)].token1);
+		printf("uso do not: %d\n", (yyvsp[(2) - (2)].token1));
+	}
+	else
 	{
 		printf("ERRO: utilizacao incorreta de 'not' na linha %d", get_line());
 		//YYERROR;

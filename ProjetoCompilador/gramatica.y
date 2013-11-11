@@ -327,8 +327,18 @@ statement:
 
 assignment_statement: variable_access T_ASSIGN expression
 {
+	printf("assignment check: %d %d\n", $1, $3);
+	
+	if(!check_assignment($1, $3))
+	{
+		printf("ERRO: Nao eh possivel atribuir um %s a um %s na linha %d\n", get_type_name($3), get_type_name($1), get_line());
+		//YYERROR;
+	}
+	
 	uso_de_const = false; // uso de constante no lado direito não é permitido;
 	printf("uso de const nao eh permitido\n");
+	
+	
 } 
 ;
 
@@ -390,7 +400,7 @@ expression: simple_expression opt_relational_operator_simple_expression
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 
@@ -411,7 +421,7 @@ opt_relational_operator_simple_expression:
 		
 	if($1 == T_INVALID || $2 == T_INVALID)
 	{
-		printf("ERRO: Operando ou operacao invalido\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 }
@@ -436,7 +446,7 @@ simple_expression: sign_operator term star_adding_operator_term
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 }
@@ -451,7 +461,7 @@ simple_expression: sign_operator term star_adding_operator_term
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 }
@@ -482,7 +492,7 @@ star_adding_operator_term:
 	}
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 	
@@ -504,7 +514,7 @@ term: factor star_multiplying_operator_factor
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 }
@@ -532,7 +542,7 @@ star_multiplying_operator_factor:
 	}
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 	
@@ -559,13 +569,18 @@ factor: constant
 	if($2 != T_INVALID) $$ = $2;
 	else
 	{
-		printf("ERRO: Operacao invalida\n");
+		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
 	}
 }
       | T_NOT factor
 {
-	if($2 != T_BOOLEAN_CONST)
+	if($2 == T_BOOLEAN_CONST || $2 == T_BOOLEAN)
+	{
+		$$ = $2;
+		printf("uso do not: %d\n", $2);
+	}
+	else
 	{
 		printf("ERRO: utilizacao incorreta de 'not' na linha %d", get_line());
 		//YYERROR;

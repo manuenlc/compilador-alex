@@ -7,6 +7,8 @@
 #ifndef TIPO_H_
 #define TIPO_H_
 
+#include "boolean.h"
+
 typedef struct expressao
 {
 	int operacao;
@@ -17,5 +19,7 @@ typedef struct expressao
 } expressao;
 
 int result_type(int operando1, int operando2, int operacao);
+bool check_assignment(int variavel, int resultado);
+char *get_type_name(int token1);
 
 #endif /* TIPO_H_ */
