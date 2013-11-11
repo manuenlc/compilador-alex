@@ -57,6 +57,12 @@ char *get_type_name(int token1)
 	case T_REAL_CONST:
 		strcpy(nome, "real");
 		break;
+	case T_CONST:
+		strcpy(nome, "const");
+		break;
+	case T_VAR:
+		strcpy(nome, "var");
+		break;
 	default:
 		strcpy(nome, "");
 	}

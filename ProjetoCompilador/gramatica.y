@@ -157,8 +157,8 @@ plus_constant_definition: constant_definition
 
 constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 {	
-		 
-		if(!insert_const($1, T_INTEGER))
+		
+		if(!insert_const($1, T_INT_CONST))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id($1), get_line());
 			YYERROR;
@@ -166,7 +166,7 @@ constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 }
                    | T_ID T_EQ T_REAL_CONST T_SEMICOLON
 {	
-		if(!insert_const($1, T_REAL))
+		if(!insert_const($1, T_REAL_CONST))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id($1), get_line());
 			YYERROR;
@@ -174,7 +174,7 @@ constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 } 
                    | T_ID T_EQ T_BOOLEAN_CONST T_SEMICOLON
 {		
-		if(!insert_const($1, T_BOOLEAN))
+		if(!insert_const($1, T_BOOLEAN_CONST))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id($1), get_line());
 			YYERROR;
@@ -333,7 +333,7 @@ assignment_statement: variable_access T_ASSIGN expression
 		YYERROR;
 	}
 	
-	uso_de_const = false; // uso de constante no lado direito não é permitido;	
+	uso_de_const = false; // uso de constante no lado direito não é permitido;
 } 
 ;
 
@@ -603,6 +603,7 @@ variable_access: T_ID
 	case T_REAL_CONST:
 	case T_BOOLEAN_CONST:
 		eh_constante = true;
+		break;
 	default:
 		eh_constante = false;
 	}
@@ -625,6 +626,7 @@ variable_access: T_ID
 	}
 	
 	uso_de_const = true;
+
 }
 ;
 

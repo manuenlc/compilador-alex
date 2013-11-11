@@ -534,7 +534,7 @@ static const yytype_uint16 yyrline[] =
      430,   433,   447,   451,   464,   465,   466,   467,   468,   469,
      472,   483,   496,   497,   501,   505,   522,   523,   524,   527,
      541,   545,   562,   563,   564,   565,   566,   569,   573,   582,
-     596,   631,   635,   639,   643
+     596,   633,   637,   641,   645
 };
 #endif
 
@@ -1584,8 +1584,8 @@ yyreduce:
   case 15:
 
     {	
-		 
-		if(!insert_const((yyvsp[(1) - (4)].token2), T_INTEGER))
+		
+		if(!insert_const((yyvsp[(1) - (4)].token2), T_INT_CONST))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id((yyvsp[(1) - (4)].token2)), get_line());
 			YYERROR;
@@ -1596,7 +1596,7 @@ yyreduce:
   case 16:
 
     {	
-		if(!insert_const((yyvsp[(1) - (4)].token2), T_REAL))
+		if(!insert_const((yyvsp[(1) - (4)].token2), T_REAL_CONST))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id((yyvsp[(1) - (4)].token2)), get_line());
 			YYERROR;
@@ -1607,7 +1607,7 @@ yyreduce:
   case 17:
 
     {		
-		if(!insert_const((yyvsp[(1) - (4)].token2), T_BOOLEAN))
+		if(!insert_const((yyvsp[(1) - (4)].token2), T_BOOLEAN_CONST))
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id((yyvsp[(1) - (4)].token2)), get_line());
 			YYERROR;
@@ -1747,7 +1747,7 @@ yyreduce:
 		YYERROR;
 	}
 	
-	uso_de_const = false; // uso de constante no lado direito não é permitido;	
+	uso_de_const = false; // uso de constante no lado direito não é permitido;
 ;}
     break;
 
@@ -2099,6 +2099,7 @@ yyreduce:
 	case T_REAL_CONST:
 	case T_BOOLEAN_CONST:
 		eh_constante = true;
+		break;
 	default:
 		eh_constante = false;
 	}
@@ -2121,6 +2122,7 @@ yyreduce:
 	}
 	
 	uso_de_const = true;
+
 ;}
     break;
 

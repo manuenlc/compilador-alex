@@ -276,7 +276,6 @@ bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumento
 
 bool insert_const(int token2, int const_tipo)
 {
-	//printf("\ntentando inserir uma constante de token 2: %d ", token2);
 	simbolo procurado;
 	procurado.tipo_simbolo = T_CONST;
 	procurado.token1 = const_tipo;
