@@ -49,8 +49,8 @@ int main()
 */
 	printf("compilando...\n");
 
-	if(!yyparse()) puts("compilado!");
-	else puts("compilacao falhou!");
+	if(!yyparse()) puts("compilado bem-sucedida!");
+	else puts("erro na compilacao!");
 
 
 	return 0;

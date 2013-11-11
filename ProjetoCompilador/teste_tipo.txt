@@ -42,7 +42,7 @@ begin
     end;
     x := 2 + (a + 1);
 	t := not d;
-    g := 3
+    i := 3 
     { no ";" is required after the last statement of a block - 
     adding one adds a "null statement" to the program }
 end.

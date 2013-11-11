@@ -23,7 +23,7 @@ bool check_assignment(int variavel, int resultado)
 	{
 	case T_INTEGER:
 	case T_INT_CONST:
-		if(variavel == T_INTEGER) return true;
+		if(variavel == T_INTEGER || variavel == T_REAL) return true;
 		else return false;
 	case T_BOOLEAN:
 	case T_BOOLEAN_CONST:
