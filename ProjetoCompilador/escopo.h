@@ -51,4 +51,6 @@ void print_current_scope();
 /** retorna o tipo associado a um token_id*/
 int get_token_type(int token2);
 
+bool check_procedure_usage(int token2, int qtd_parametros, int *tipo_argumentos);
+
 #endif /* ESCOPO_H_ */

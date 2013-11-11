@@ -100,10 +100,10 @@ int procedure_token2;
 
 %right T_THEN T_ELSE
 
-%type<token1> type constant variable_access factor adding_operator term multiplying_operator relational_operator simple_expression expression
+%type<token1> type constant variable_access factor adding_operator term multiplying_operator relational_operator simple_expression expression actual_parameter
 %type<expressao_info> star_multiplying_operator_factor star_adding_operator_term opt_relational_operator_simple_expression
-%type<procedure_info> opt_brc_actual_parameter_list_brc
-%type<token2> T_ID  
+%type<procedure_info> star_comma_actual_parameter actual_parameter_list opt_brc_actual_parameter_list_brc
+%type<token2> T_ID   
 %type<token_valor_real> T_REAL_CONST
 %type<token_valor_int> T_INT_CONST
 %type<token_valor_boolean> T_BOOLEAN_CONST
@@ -262,7 +262,7 @@ opt_brc_formal_parameter_list_brc:
                                  | T_LBRACKET formal_parameter_list T_RBRACKET
 {
 
-	if(!insert_procedure(procedure_token2, quantidade_arg_adicionados, arg_token2))
+	if(!insert_procedure(procedure_token2, quantidade_arg_adicionados, arg_token1))
 	{
 		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(procedure_token2), get_line());
 		YYERROR;
@@ -350,12 +350,24 @@ procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 		printf("ERRO: A procedure %s eh utilizada na linha %d mas não foi declarada\n", get_token2_id($1), get_line());
 		YYERROR;
 	}
+	
+	
+	if(!check_procedure_usage($1, $2.qtd_argumentos, arg_token1))
+	{
+		printf("ERRO: A procedure %s eh utilizada incorretamente na linha %d\n", get_token2_id($1), get_line());
+		//YYERROR;
+	}
 }
 ;
 
 opt_brc_actual_parameter_list_brc:
+{
+	$$.qtd_argumentos = 0;
+	printf("procedure usada sem parametros\n");
+}
                                  | T_LBRACKET set_procedure_par actual_parameter_list T_RBRACKET
 {
+	$$.qtd_argumentos = $3.qtd_argumentos;
 	eh_procedure_parametro = false;
 }
 ;
@@ -366,13 +378,30 @@ set_procedure_par:
 }
 
 actual_parameter_list: actual_parameter star_comma_actual_parameter
+{
+	arg_token1[$2.qtd_argumentos] = $1;
+	$$.qtd_argumentos = $2.qtd_argumentos + 1;
+	printf("#lendo parametro %d. ha %d parametros\n", $1, $$.qtd_argumentos);
+}
 ;
 
-star_comma_actual_parameter: 
+star_comma_actual_parameter:
+{
+	$$.qtd_argumentos = 0;
+	printf("ultimo parametro lido\n");
+}
                           | T_COMMA actual_parameter star_comma_actual_parameter
+{
+	arg_token1[$3.qtd_argumentos] = $2;
+	$$.qtd_argumentos = $3.qtd_argumentos + 1;
+	printf("lendo parametro %d. ha %d parametros\n", $2, $$.qtd_argumentos);
+}
 ;
 
 actual_parameter: expression
+{
+	$$ = $1;
+}
 ;
 
 if_statement: T_IF expression T_THEN statement

@@ -195,7 +195,7 @@ typedef union YYSTYPE
     float token_valor_real;
     int token_valor_boolean;
     
-    //struct simbolo simbolo_info;
+    struct procedure procedure_info;
     struct expressao expressao_info;
 
 
@@ -524,16 +524,16 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   113,   113,   117,   122,   128,   129,   132,   133,   137,
-     141,   145,   151,   154,   155,   158,   167,   175,   185,   188,
-     189,   192,   195,   215,   216,   224,   228,   232,   238,   241,
-     244,   251,   261,   288,   291,   292,   295,   298,   311,   312,
-     320,   321,   322,   323,   324,   325,   328,   345,   355,   356,
-     363,   367,   370,   371,   374,   377,   378,   381,   385,   388,
-     389,   392,   411,   416,   430,   431,   432,   433,   434,   435,
-     438,   453,   470,   471,   475,   480,   503,   504,   505,   508,
-     524,   530,   554,   555,   556,   557,   558,   561,   565,   576,
-     591,   639,   644,   649,   654
+       0,   114,   114,   118,   123,   129,   130,   133,   134,   138,
+     142,   146,   152,   155,   156,   159,   168,   176,   186,   189,
+     190,   193,   196,   216,   217,   225,   229,   233,   239,   242,
+     245,   252,   262,   289,   292,   293,   296,   299,   312,   313,
+     321,   322,   323,   324,   325,   326,   329,   346,   364,   368,
+     376,   380,   389,   393,   401,   407,   408,   411,   415,   418,
+     419,   422,   441,   446,   460,   461,   462,   463,   464,   465,
+     468,   483,   500,   501,   505,   510,   533,   534,   535,   538,
+     554,   560,   581,   582,   583,   584,   585,   588,   592,   601,
+     615,   653,   657,   661,   665
 };
 #endif
 
@@ -1692,7 +1692,7 @@ yyreduce:
 
     {
 
-	if(!insert_procedure(procedure_token2, quantidade_arg_adicionados, arg_token2))
+	if(!insert_procedure(procedure_token2, quantidade_arg_adicionados, arg_token1))
 	{
 		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(procedure_token2), get_line());
 		YYERROR;
@@ -1765,12 +1765,28 @@ yyreduce:
 		printf("ERRO: A procedure %s eh utilizada na linha %d mas não foi declarada\n", get_token2_id((yyvsp[(1) - (2)].token2)), get_line());
 		YYERROR;
 	}
+	
+	
+	if(!check_procedure_usage((yyvsp[(1) - (2)].token2), (yyvsp[(2) - (2)].procedure_info).qtd_argumentos, arg_token1))
+	{
+		printf("ERRO: A procedure %s eh utilizada incorretamente na linha %d\n", get_token2_id((yyvsp[(1) - (2)].token2)), get_line());
+		//YYERROR;
+	}
+;}
+    break;
+
+  case 48:
+
+    {
+	(yyval.procedure_info).qtd_argumentos = 0;
+	printf("procedure usada sem parametros\n");
 ;}
     break;
 
   case 49:
 
     {
+	(yyval.procedure_info).qtd_argumentos = (yyvsp[(3) - (4)].procedure_info).qtd_argumentos;
 	eh_procedure_parametro = false;
 ;}
     break;
@@ -1779,6 +1795,39 @@ yyreduce:
 
     {
 	eh_procedure_parametro = true;
+;}
+    break;
+
+  case 51:
+
+    {
+	arg_token1[(yyvsp[(2) - (2)].procedure_info).qtd_argumentos] = (yyvsp[(1) - (2)].token1);
+	(yyval.procedure_info).qtd_argumentos = (yyvsp[(2) - (2)].procedure_info).qtd_argumentos + 1;
+	printf("#lendo parametro %d. ha %d parametros\n", (yyvsp[(1) - (2)].token1), (yyval.procedure_info).qtd_argumentos);
+;}
+    break;
+
+  case 52:
+
+    {
+	(yyval.procedure_info).qtd_argumentos = 0;
+	printf("ultimo parametro lido\n");
+;}
+    break;
+
+  case 53:
+
+    {
+	arg_token1[(yyvsp[(3) - (3)].procedure_info).qtd_argumentos] = (yyvsp[(2) - (3)].token1);
+	(yyval.procedure_info).qtd_argumentos = (yyvsp[(3) - (3)].procedure_info).qtd_argumentos + 1;
+	printf("lendo parametro %d. ha %d parametros\n", (yyvsp[(2) - (3)].token1), (yyval.procedure_info).qtd_argumentos);
+;}
+    break;
+
+  case 54:
+
+    {
+	(yyval.token1) = (yyvsp[(1) - (1)].token1);
 ;}
     break;
 
@@ -1983,10 +2032,7 @@ yyreduce:
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
-	}
-	
-	printf("*2");
-	
+	}	
 ;}
     break;
 
@@ -2024,14 +2070,12 @@ yyreduce:
 
   case 88:
 
-    {
-	printf("(%d)\n", (yyvsp[(2) - (3)].token1));
-	
+    {	
 	if((yyvsp[(2) - (3)].token1) != T_INVALID) (yyval.token1) = (yyvsp[(2) - (3)].token1);
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
-		//YYERROR;
+		YYERROR;
 	}
 ;}
     break;
@@ -2042,12 +2086,11 @@ yyreduce:
 	if((yyvsp[(2) - (2)].token1) == T_BOOLEAN_CONST || (yyvsp[(2) - (2)].token1) == T_BOOLEAN)
 	{
 		(yyval.token1) = (yyvsp[(2) - (2)].token1);
-		printf("uso do not: %d\n", (yyvsp[(2) - (2)].token1));
 	}
 	else
 	{
 		printf("ERRO: utilizacao incorreta de 'not' na linha %d", get_line());
-		//YYERROR;
+		YYERROR;
 	}
 ;}
     break;
@@ -2075,12 +2118,7 @@ yyreduce:
 			printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id((yyvsp[(1) - (1)].token2)), get_line());
 			YYERROR;
 		}
-		else
-		{
-			(yyval.token1) = get_token_type((yyvsp[(1) - (1)].token2));
-			printf("setando var_acess: %d\n", (yyval.token1));
-			
-		}
+		else (yyval.token1) = get_token_type((yyvsp[(1) - (1)].token2));
 	}
 	else
 	{	if(!search_parameter_or_var_on_current_scope_and_bellow((yyvsp[(1) - (1)].token2)))
@@ -2089,15 +2127,10 @@ yyreduce:
 			else printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id((yyvsp[(1) - (1)].token2)), get_line());
 			YYERROR;
 		}
-		else
-		{
-			(yyval.token1) = get_token_type((yyvsp[(1) - (1)].token2));
-			printf("setando var_acess: %d\n", (yyval.token1));
-		}
+		else (yyval.token1) = get_token_type((yyvsp[(1) - (1)].token2));
 	}
 	
 	uso_de_const = true;
-	printf("uso de const permitido\n");
 ;}
     break;
 
@@ -2105,7 +2138,6 @@ yyreduce:
 
     {
 	(yyval.token1) = T_INT_CONST;
-	printf("chamado int_cont\n");
 ;}
     break;
 
@@ -2113,7 +2145,6 @@ yyreduce:
 
     {
 	(yyval.token1) = T_REAL_CONST;
-	printf("chamado real_cont\n");
 ;}
     break;
 
@@ -2121,7 +2152,6 @@ yyreduce:
 
     {
 	(yyval.token1) = T_BOOLEAN_CONST;
-	printf("chamado bool_cont\n");
 ;}
     break;
 
@@ -2129,7 +2159,7 @@ yyreduce:
 
     {
 	(yyval.token1) = (yyvsp[(1) - (1)].token1);
-	printf("pode ser var_id ou procedure_id. var_acess %d\n", (yyvsp[(1) - (1)].token1));
+	//printf("pode ser var_id ou procedure_id. var_acess %d\n", $1);
 ;}
     break;
 

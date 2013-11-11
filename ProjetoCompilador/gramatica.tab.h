@@ -115,7 +115,7 @@ typedef union YYSTYPE
     float token_valor_real;
     int token_valor_boolean;
     
-    //struct simbolo simbolo_info;
+    struct procedure procedure_info;
     struct expressao expressao_info;
 
 
