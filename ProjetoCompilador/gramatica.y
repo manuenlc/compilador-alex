@@ -17,6 +17,7 @@ int var_token2[20];
 bool eh_declaracao_procedure;
 bool eh_procedure_parametro;
 bool uso_de_const;
+bool eh_constante;
 
 int tipo_constante;
 int type_atual;
@@ -137,7 +138,6 @@ opt_variable_definition_part:
 star_procedure_definition:
 {
 	eh_declaracao_procedure = false;
-	printf("\nfim de declaracao de procedure\n");
 } 
                          | set_procedure_definition procedure_definition star_procedure_definition
 ;
@@ -145,7 +145,6 @@ star_procedure_definition:
 set_procedure_definition :
 {
 	eh_declaracao_procedure = true;
-	printf("\ndeclaracao de procedure\n");
 } 
 ;
 
@@ -327,19 +326,14 @@ statement:
 ;
 
 assignment_statement: variable_access T_ASSIGN expression
-{
-	printf("assignment check: %d %d\n", $1, $3);
-	
+{	
 	if(!check_assignment($1, $3))
 	{
 		printf("ERRO: Nao eh possivel atribuir um %s a um %s na linha %d\n", get_type_name($3), get_type_name($1), get_line());
-		//YYERROR;
+		YYERROR;
 	}
 	
-	uso_de_const = false; // uso de constante no lado direito não é permitido;
-	printf("uso de const nao eh permitido\n");
-	
-	
+	uso_de_const = false; // uso de constante no lado direito não é permitido;	
 } 
 ;
 
@@ -355,7 +349,7 @@ procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 	if(!check_procedure_usage($1, $2.qtd_argumentos, arg_token1))
 	{
 		printf("ERRO: A procedure %s eh utilizada incorretamente na linha %d\n", get_token2_id($1), get_line());
-		//YYERROR;
+		YYERROR;
 	}
 }
 ;
@@ -363,7 +357,6 @@ procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 opt_brc_actual_parameter_list_brc:
 {
 	$$.qtd_argumentos = 0;
-	printf("procedure usada sem parametros\n");
 }
                                  | T_LBRACKET set_procedure_par actual_parameter_list T_RBRACKET
 {
@@ -381,20 +374,17 @@ actual_parameter_list: actual_parameter star_comma_actual_parameter
 {
 	arg_token1[$2.qtd_argumentos] = $1;
 	$$.qtd_argumentos = $2.qtd_argumentos + 1;
-	printf("#lendo parametro %d. ha %d parametros\n", $1, $$.qtd_argumentos);
 }
 ;
 
 star_comma_actual_parameter:
 {
 	$$.qtd_argumentos = 0;
-	printf("ultimo parametro lido\n");
 }
                           | T_COMMA actual_parameter star_comma_actual_parameter
 {
 	arg_token1[$3.qtd_argumentos] = $2;
 	$$.qtd_argumentos = $3.qtd_argumentos + 1;
-	printf("lendo parametro %d. ha %d parametros\n", $2, $$.qtd_argumentos);
 }
 ;
 
@@ -405,10 +395,31 @@ actual_parameter: expression
 ;
 
 if_statement: T_IF expression T_THEN statement
+{
+	if($2 != T_BOOLEAN && $2 != T_BOOLEAN_CONST)
+	{
+		printf("ERRO: A condicao do 'if' na linha %d deve ser um booleano\n", get_line());
+		YYERROR;
+	}
+}
             | T_IF expression T_THEN statement T_ELSE statement
+{
+	if($2 != T_BOOLEAN && $2 != T_BOOLEAN_CONST)
+	{
+		printf("ERRO: A condicao do 'if' na linha %d deve ser um booleano\n", get_line());
+		YYERROR;
+	}
+}
 ;
 
 while_statement: T_WHILE expression T_DO statement
+{
+	if($2 != T_BOOLEAN && $2 != T_BOOLEAN_CONST)
+	{
+		printf("ERRO: A condicao do 'while' na linha %d deve ser um booleano\n", get_line());
+		YYERROR;
+	}
+}
 ;
 
 
@@ -421,38 +432,31 @@ star_comma_statement:
 
 expression: simple_expression opt_relational_operator_simple_expression
 {
-	printf("relational\n");
-	
 	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
-	
-	printf("resultado da operacao: %d\n", tipo_resultado);
 		
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
-		//YYERROR;
+		YYERROR;
 	}
-
 }
 ;
 
 opt_relational_operator_simple_expression:
 {
-	printf("relational#");
 	$$.tipo_operando1 = T_EOF;
 	$$.operacao = T_EOF;	
 }
                                          | relational_operator simple_expression
 {
-	printf("relational#2\n");
 	$$.tipo_operando1 = $2;
 	$$.operacao = $1;
 		
 	if($1 == T_INVALID || $2 == T_INVALID)
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
-		//YYERROR;
+		YYERROR;
 	}
 }
 ;
@@ -467,32 +471,24 @@ relational_operator: T_LT  { $$ = T_LT;  }
 
 simple_expression: sign_operator term star_adding_operator_term
 {
-	printf("++1");
-	
 	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
-	
-	printf("resultado da operacao: %d\n", tipo_resultado);
 		
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
-		//YYERROR;
+		YYERROR;
 	}
 }
                  | term star_adding_operator_term
 {
-	printf("++2");
-	
 	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
-	
-	printf("resultado da operacao: %d\n", tipo_resultado);
 		
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
-		//YYERROR;
+		YYERROR;
 	}
 }
 ;
@@ -503,17 +499,12 @@ sign_operator: T_PLUS
 
 star_adding_operator_term:
 {
-	printf("#+2");
 	$$.tipo_operando1 = T_EOF;
 	$$.operacao = T_EOF;
 }
                          | adding_operator term star_adding_operator_term
 {
-	printf("+2");
-	
 	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
-
-	printf("resultado da operacao: %d\n", tipo_resultado);
 	
 	if(tipo_resultado != T_INVALID)
 	{
@@ -523,10 +514,8 @@ star_adding_operator_term:
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
-		//YYERROR;
+		YYERROR;
 	}
-	
-	printf("@");
 }
 ;
 
@@ -538,14 +527,12 @@ adding_operator: T_PLUS 	{$$ = T_PLUS; }
 term: factor star_multiplying_operator_factor
 {
 	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
-	
-	printf("resultado da operacao: %d\n", tipo_resultado);
 		
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
-		//YYERROR;
+		YYERROR;
 	}
 }
 ;
@@ -554,17 +541,11 @@ star_multiplying_operator_factor:
 {
 	$$.tipo_operando1 = T_EOF;
 	$$.operacao = T_EOF;
-	
-	{printf("*1");} 
 }
                                 | multiplying_operator factor star_multiplying_operator_factor
 {
-	printf("*2");
-	
 	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
 
-	printf("resultado da operacao: %d\n", tipo_resultado);
-	
 	if(tipo_resultado != T_INVALID)
 	{
 		$$.tipo_operando1 = tipo_resultado;
@@ -573,7 +554,7 @@ star_multiplying_operator_factor:
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
-		//YYERROR;
+		YYERROR;
 	}	
 }
 ;
@@ -613,9 +594,8 @@ factor: constant
 ;
 
 variable_access: T_ID
-{
-	printf("chamou var_acess. id %s\n", get_token2_id($1));
-	bool eh_constante;
+{	
+	$$ = get_token_type($1);
 	
 	switch($$)
 	{
@@ -634,7 +614,6 @@ variable_access: T_ID
 			printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
 			YYERROR;
 		}
-		else $$ = get_token_type($1);
 	}
 	else
 	{	if(!search_parameter_or_var_on_current_scope_and_bellow($1))
@@ -643,7 +622,6 @@ variable_access: T_ID
 			else printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
 			YYERROR;
 		}
-		else $$ = get_token_type($1);
 	}
 	
 	uso_de_const = true;
@@ -665,7 +643,6 @@ constant: T_INT_CONST
         | variable_access
 {
 	$$ = $1;
-	//printf("pode ser var_id ou procedure_id. var_acess %d\n", $1);
 }
 ;
 %%

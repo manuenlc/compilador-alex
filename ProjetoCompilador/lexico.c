@@ -394,7 +394,7 @@ void go_back_the_char_read()
 char next_char()
 {
 	char c = tolower(fgetc(arquivo_fonte));
-	if(c == '\n') {c = tolower(fgetc(arquivo_fonte)); ++linhas_lidas; printf("linha: %d\n", linhas_lidas);}
+	if(c == '\n') {c = tolower(fgetc(arquivo_fonte)); ++linhas_lidas; /*printf("linha: %d\n", linhas_lidas);*/}
 	return c;
 }
 
@@ -429,7 +429,7 @@ int yylex(void)
 {
 	token token_lido = next_token();
 
-	printf("%d \n", token_lido.token1);
+	//printf("%d \n", token_lido.token1);
 
 	switch(token_lido.token1)
 	{

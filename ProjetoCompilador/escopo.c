@@ -109,8 +109,6 @@ bool check_procedure_usage(int token2, int qtd_parametros, int *tipo_argumentos)
 {
 	int i, j, k;
 
-	printf("check procedure: tk2 %d qtd_par %d\n", token2, qtd_parametros);
-
 	for(i = altura_escopo; i >= 0 ; --i)
 		for(j = 0; j < largura_escopo[i]; ++j)
 			if(escopo[i][j].token2 == token2 && escopo[i][j].tipo_simbolo == T_PROCEDURE)
@@ -121,17 +119,10 @@ bool check_procedure_usage(int token2, int qtd_parametros, int *tipo_argumentos)
 					if(qtd_parametros == 0) return true;
 					else
 					{
-						printf("parametros lidos:" );
-						for(k = 0; k < qtd_parametros; ++k)
-						{
-							printf("%d ", tipo_argumentos[k]);
-						}
-						printf("\n");
 						/* obs: quando um procedure é usada, os parametros são
 						 * lidos ao contrario do que foi armazenado em escopo[*][*] */
 						for(k = 0; k < qtd_parametros; ++k)
 						{
-							printf("checkin par_used %d par_def %d\n", tipo_argumentos[k], escopo[i][j].tipo_argumentos[qtd_parametros - k - 1]);
 							switch(tipo_argumentos[k])
 							{
 							case T_INTEGER:
@@ -259,7 +250,7 @@ bool insert_parameter(int token2, int parametro_tipo)
 
 bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumentos)
 {
-	printf("\ntentando inserir uma procedure de token 2: %d e qtd_args %d ", token2, quantidade_argumentos);
+	//printf("\ntentando inserir uma procedure de token 2: %d e qtd_args %d ", token2, quantidade_argumentos);
 	simbolo procurado;
 	procurado.tipo_simbolo = T_PROCEDURE;
 	procurado.token1 = T_PROCEDURE;
@@ -271,10 +262,10 @@ bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumento
 		int i;
 		for(i = 0; i < quantidade_argumentos; ++i)
 		{
-			printf("arg tk1: %d | ", tipo_argumentos[i]);
+			//printf("arg tk1: %d | ", tipo_argumentos[i]);
 			procurado.tipo_argumentos[i] = tipo_argumentos[i];
 		}
-		printf("\n");
+		//printf("\n");
 	}
 
 	bool achou = search_token2_on_current_scope(token2);

@@ -7,7 +7,7 @@ program HelloWorld;
     var
         e, f, g, x, y : (* yes, they are integers *) integer;
         h, z2, i : real;
-		bb : boolean;
+		t : boolean;
 		
 
    procedure ProcedureWithNoParams ;
@@ -37,10 +37,10 @@ begin
         procedureWithNoParams
     else
     begin
-        x := 3.8;
+        x := 3;
     end;
     x := 2 + (a + 1);
-	bb := not d;
+	t := not d;
     y := 3
     { no ";" is required after the last statement of a block - 
     adding one adds a "null statement" to the program }

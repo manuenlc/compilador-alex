@@ -65,7 +65,7 @@ char *get_type_name(int token1)
 
 int result_type(int operando1, int operando2, int operacao)
 {
-	printf("operandos: %d %d operacao: %d\n", operando1, operando2, operacao);
+	//printf("operandos: %d %d operacao: %d\n", operando1, operando2, operacao);
 	switch(operacao)
 	{
 	case T_PLUS:

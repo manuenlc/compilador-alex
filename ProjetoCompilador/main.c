@@ -22,7 +22,7 @@ extern int yyparse(void);
 
 int main()
 {
-	FILE *file = fopen("C:\\Users\\Emanuelle\\workspace c++\\ProjetoCompilador\\teste_sintatico2.txt", "r");
+	FILE *file = fopen("C:\\Users\\Emanuelle\\workspace c++\\ProjetoCompilador\\teste_tipo.txt", "r");
 
 	if(!file)
 	{
