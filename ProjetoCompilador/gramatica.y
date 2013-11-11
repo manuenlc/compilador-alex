@@ -39,7 +39,7 @@ int procedure_token2;
     float token_valor_real;
     int token_valor_boolean;
     
-    //struct simbolo simbolo_info;
+    struct procedure procedure_info;
     struct expressao expressao_info;
 }
 
@@ -102,6 +102,7 @@ int procedure_token2;
 
 %type<token1> type constant variable_access factor adding_operator term multiplying_operator relational_operator simple_expression expression
 %type<expressao_info> star_multiplying_operator_factor star_adding_operator_term opt_relational_operator_simple_expression
+%type<procedure_info> opt_brc_actual_parameter_list_brc
 %type<token2> T_ID  
 %type<token_valor_real> T_REAL_CONST
 %type<token_valor_int> T_INT_CONST
@@ -544,10 +545,7 @@ star_multiplying_operator_factor:
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		//YYERROR;
-	}
-	
-	printf("*2");
-	
+	}	
 }
 ;
 
@@ -563,14 +561,12 @@ factor: constant
 	$$ = $1;
 }
       | T_LBRACKET expression T_RBRACKET
-{
-	printf("(%d)\n", $2);
-	
+{	
 	if($2 != T_INVALID) $$ = $2;
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
-		//YYERROR;
+		YYERROR;
 	}
 }
       | T_NOT factor
@@ -578,12 +574,11 @@ factor: constant
 	if($2 == T_BOOLEAN_CONST || $2 == T_BOOLEAN)
 	{
 		$$ = $2;
-		printf("uso do not: %d\n", $2);
 	}
 	else
 	{
 		printf("ERRO: utilizacao incorreta de 'not' na linha %d", get_line());
-		//YYERROR;
+		YYERROR;
 	}
 }
 ;
@@ -610,12 +605,7 @@ variable_access: T_ID
 			printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
 			YYERROR;
 		}
-		else
-		{
-			$$ = get_token_type($1);
-			printf("setando var_acess: %d\n", $$);
-			
-		}
+		else $$ = get_token_type($1);
 	}
 	else
 	{	if(!search_parameter_or_var_on_current_scope_and_bellow($1))
@@ -624,37 +614,29 @@ variable_access: T_ID
 			else printf("ERRO: O simbolo %s eh utilizado na linha %d mas não foi declarado\n", get_token2_id($1), get_line());
 			YYERROR;
 		}
-		else
-		{
-			$$ = get_token_type($1);
-			printf("setando var_acess: %d\n", $$);
-		}
+		else $$ = get_token_type($1);
 	}
 	
 	uso_de_const = true;
-	printf("uso de const permitido\n");
 }
 ;
 
 constant: T_INT_CONST
 {
 	$$ = T_INT_CONST;
-	printf("chamado int_cont\n");
 }
         | T_REAL_CONST
 {
 	$$ = T_REAL_CONST;
-	printf("chamado real_cont\n");
 }
         | T_BOOLEAN_CONST
 {
 	$$ = T_BOOLEAN_CONST;
-	printf("chamado bool_cont\n");
 }
         | variable_access
 {
 	$$ = $1;
-	printf("pode ser var_id ou procedure_id. var_acess %d\n", $1);
+	//printf("pode ser var_id ou procedure_id. var_acess %d\n", $1);
 }
 ;
 %%
