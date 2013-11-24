@@ -14,6 +14,7 @@ int arg_token2[20];
 int arg_token1[20];
 int quantidade_arg_adicionados = 0;
 int quantidade_var = 0;
+int quantidade_var_alocadas = 0;
 int var_token2[20];
 bool eh_declaracao_procedure;
 bool eh_procedure_parametro;
@@ -103,7 +104,7 @@ int procedure_token2;
 
 %right T_THEN T_ELSE
 
-%type<token1> type constant variable_access factor adding_operator term multiplying_operator relational_operator simple_expression expression actual_parameter
+%type<token1> type constant variable_access factor adding_operator term multiplying_operator relational_operator simple_expression expression actual_parameter sign_operator
 %type<expressao_info> star_multiplying_operator_factor star_adding_operator_term opt_relational_operator_simple_expression
 %type<procedure_info> star_comma_actual_parameter actual_parameter_list opt_brc_actual_parameter_list_brc
 %type<token2> T_ID   
@@ -126,7 +127,7 @@ insert_print_procedure:
 }
 ;
 
-block_body: opt_constant_definition_part opt_variable_definition_part star_procedure_definition compound_statement
+block_body: opt_constant_definition_part opt_variable_definition_part allocate_vars star_procedure_definition compound_statement
 {
 	end_block();
 	wml_procedure_or_program_end();
@@ -137,7 +138,18 @@ opt_constant_definition_part:
                             | constant_definition_part
 ;
 
+allocate_vars:
+{
+	if(eh_declaracao_procedure) wml_allocate_procedure_vars(quantidade_var_alocadas);		
+	
+	quantidade_var_alocadas = 0;
+}
+;
+
 opt_variable_definition_part: 
+{
+	quantidade_var_alocadas = 0;
+}
                             | variable_definition_part  
 ;
 
@@ -193,7 +205,7 @@ constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 variable_definition_part: T_VAR plus_variable_definition
 ;
 
-plus_variable_definition: variable_definition 
+plus_variable_definition: variable_definition
                         | variable_definition plus_variable_definition
 ;
 
@@ -204,6 +216,10 @@ variable_group: T_ID star_comma_id T_COLON type
 {	
 	var_token2[quantidade_var] = $1;
 	++quantidade_var;
+	
+	quantidade_var_alocadas += quantidade_var; 
+	
+	printf("inc qtd_var_alloc %d\n", quantidade_var_alocadas);
 	
 	int i;
 	
@@ -449,6 +465,8 @@ star_comma_statement:
 expression: simple_expression opt_relational_operator_simple_expression
 {
 	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
+	
+	wml_operation_usage($1, $2.tipo_operando1, $2.operacao);
 		
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
@@ -495,6 +513,8 @@ simple_expression: sign_operator term star_adding_operator_term
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		YYERROR;
 	}
+	
+	wml_operation_usage(T_VOID, T_VOID, $1);
 }
                  | term star_adding_operator_term
 {
@@ -509,8 +529,8 @@ simple_expression: sign_operator term star_adding_operator_term
 }
 ;
 
-sign_operator: T_PLUS
-             | T_MINUS 
+sign_operator: T_PLUS { $$ = T_PLUS; }
+             | T_MINUS { $$ = T_MINUS; }
 ;
 
 star_adding_operator_term:
@@ -521,6 +541,8 @@ star_adding_operator_term:
                          | adding_operator term star_adding_operator_term
 {
 	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
+	
+	wml_operation_usage($2, $3.tipo_operando1, $3.operacao);
 	
 	if(tipo_resultado != T_INVALID)
 	{
@@ -543,6 +565,8 @@ adding_operator: T_PLUS 	{$$ = T_PLUS; }
 term: factor star_multiplying_operator_factor
 {
 	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
+	
+	wml_operation_usage($1, $2.tipo_operando1, $2.operacao);
 		
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else

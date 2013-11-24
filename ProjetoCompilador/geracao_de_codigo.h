@@ -27,8 +27,11 @@ void wml_generate_int_const_def(int valor_int_const);
 //void wml_generate_boolean_const_def(bool boolena_const_value);
 
 void wml_generate_procedure(char *nome, int token2, int qtd_argumentos);
+void wml_allocate_procedure_vars(int qtd_var_alocadas);
 void wml_procedure_usage(int procedure_token2);
 void wml_procedure_or_program_end();
+
+void wml_operation_usage(int op1_token2, int op2_token2, int operacao);
 
 int new_label();
 void push_label(int label);

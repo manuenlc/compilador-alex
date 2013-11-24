@@ -29,6 +29,9 @@ void wml_generate_int_const_def(int valor_int_const);
 void wml_generate_procedure(char *nome, int token2, int qtd_argumentos);
 void wml_procedure_usage(int procedure_token2);
 void wml_procedure_or_program_end();
+void wml_allocate_procedure_vars(int qtd_var_alocadas);
+
+void wml_operation_usage(int op1_token2, int op2_token2, int operacao);
 
 int new_label();
 void push_label(int label);
@@ -125,6 +128,11 @@ void wml_generate_procedure(char *nome, int token2, int qtd_argumentos)
 		printf("EXTERN FUNCTION %s %d %d\n", nome, get_and_store_procedure_id(nome, token2), qtd_argumentos);
 }
 
+void wml_allocate_procedure_vars(int qtd_var_alocadas)
+{
+	printf("FUNCVARS %d\n", qtd_var_alocadas);
+}
+
 void wml_procedure_usage(int procedure_token2)
 {
 	if(!strcmp(get_token2_id(procedure_token2), "print")) wml_generate_print();
@@ -139,4 +147,44 @@ void wml_procedure_or_program_end()
 void wml_generate_print()
 {
 	printf("CALL_LIB_S 2 5\n");
+}
+
+void wml_operation_usage(int op1_token2, int op2_token2, int operacao)
+{
+	if(op2_token2 == T_EOF) return ;
+
+	if(op1_token2 != T_VOID) printf("LOAD_X op1 %d\n", op1_token2);
+	if(op1_token2 != T_VOID) printf("LOAD_X op2 %d\n", op2_token2);
+
+	switch(operacao)
+	{
+	case T_AND:
+		printf("ADD\n");
+		break;
+	case T_DIF:
+		printf("NE\n");
+		break;
+	case T_MOD:
+		printf("REM\n");
+		break;
+	case T_LT:
+		printf("LT\n");
+		break;
+	case T_TIMES:
+		printf("MUL\n");
+		break;
+	case T_DIV:
+		printf("IDIV\n");
+		break;
+	case T_EQ:
+		printf("EQ:\n");
+		break;
+	case T_MINUS:
+		if(op2_token2 == T_VOID) printf("UMINUS\n");
+		else printf("SUB\n");
+		break;
+	default:
+		printf("falta adicionar operacao %d\n", operacao);
+
+	}
 }
