@@ -128,7 +128,8 @@ insert_print_procedure:
 
 block_body: opt_constant_definition_part opt_variable_definition_part star_procedure_definition compound_statement
 {
-	end_block()
+	end_block();
+	wml_procedure_or_program_end();
 }
 ;
 
@@ -365,7 +366,7 @@ procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 		YYERROR;
 	}
 	
-	
+	wml_procedure_usage($1);
 }
 ;
 
