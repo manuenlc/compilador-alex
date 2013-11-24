@@ -28,6 +28,7 @@ bool insert_var(int token2, int var_tipo);
 bool insert_parameter(int token2, int parametro_tipo);
 bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumentos);
 bool insert_const(int token2, int const_tipo);
+bool insert_procedure_print(int procedure_print_token2);
 
 bool check_procedure_usage(int token2, int qtd_parametros, int *tipo_argumentos);
 
@@ -55,16 +56,12 @@ void begin_block()
 {
 	if(altura_escopo < ALTURA_ESCOPO_MAX) largura_escopo[++altura_escopo] = 0;
 	else printf("limite de altura de escopo atingido\n");
-
-	//printf("novo escopo %d\n", altura_escopo);
 }
 
 void end_block()
 {
-	//printf("eliminando escopo %d\n", altura_escopo);
 	if(altura_escopo >= 0) largura_escopo[altura_escopo--] = 0;
 	else printf("nao ha mais escopo para eliminar\n");
-
 }
 
 bool is_equal(simbolo simbolo_procurado, int altura_escopo, int largura_escopo)
@@ -110,7 +107,9 @@ bool check_procedure_usage(int token2, int qtd_parametros, int *tipo_argumentos)
 	int i, j, k;
 
 	for(i = altura_escopo; i >= 0 ; --i)
+	{
 		for(j = 0; j < largura_escopo[i]; ++j)
+		{
 			if(escopo[i][j].token2 == token2 && escopo[i][j].tipo_simbolo == T_PROCEDURE)
 			{
 				if(qtd_parametros != escopo[i][j].quantidade_parametros) return false;
@@ -127,7 +126,8 @@ bool check_procedure_usage(int token2, int qtd_parametros, int *tipo_argumentos)
 							{
 							case T_INTEGER:
 							case T_INT_CONST:
-								if(escopo[i][j].tipo_argumentos[qtd_parametros - k - 1] != T_INTEGER) return false;
+								if(escopo[i][j].tipo_argumentos[qtd_parametros - k - 1] != T_INTEGER &&
+										escopo[i][j].tipo_argumentos[qtd_parametros - k - 1] != T_REAL) return false;
 								break;
 							case T_BOOLEAN:
 							case T_BOOLEAN_CONST:
@@ -146,6 +146,8 @@ bool check_procedure_usage(int token2, int qtd_parametros, int *tipo_argumentos)
 					}
 				}
 			}
+		}
+	}
 
 	return false;
 }
@@ -259,16 +261,33 @@ bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumento
 
 	if(quantidade_argumentos > 0)
 	{
+		printf("qts de args da proc %d: %d ", token2, quantidade_argumentos);
+
 		int i;
 		for(i = 0; i < quantidade_argumentos; ++i)
 		{
-			//printf("arg tk1: %d | ", tipo_argumentos[i]);
+			printf("arg %d: %d | ", i + 1, tipo_argumentos[i]);
 			procurado.tipo_argumentos[i] = tipo_argumentos[i];
 		}
-		//printf("\n");
+		printf("\n");
 	}
 
 	bool achou = search_token2_on_current_scope(token2);
+
+	if(achou) return false; //o simbolo ja esta na tabela
+	else return insert_symbol(procurado);
+}
+
+bool insert_procedure_print(int procedure_print_token2)
+{
+	simbolo procurado;
+	procurado.tipo_simbolo = T_PROCEDURE;
+	procurado.token1 = T_PROCEDURE;
+	procurado.token2 = procedure_print_token2;
+	procurado.quantidade_parametros = 1;
+	procurado.tipo_argumentos[0] = T_INTEGER;
+
+	bool achou = search_token2_on_current_scope(procedure_print_token2);
 
 	if(achou) return false; //o simbolo ja esta na tabela
 	else return insert_symbol(procurado);

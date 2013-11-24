@@ -494,7 +494,7 @@ static const yytype_uint8 yyprhs[] =
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      54,     0,    -1,     7,     3,    35,    55,    56,    37,    -1,
+      54,     0,    -1,     7,    55,     3,    35,    56,    37,    -1,
       -1,    57,    58,    59,    89,    -1,    -1,    61,    -1,    -1,
       64,    -1,    -1,    60,    70,    59,    -1,    -1,    41,    62,
       -1,    63,    -1,    63,    62,    -1,     3,    44,     4,    35,
@@ -525,16 +525,16 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   115,   115,   119,   124,   130,   131,   134,   135,   139,
-     142,   146,   151,   154,   155,   158,   167,   175,   185,   188,
-     189,   192,   195,   215,   216,   224,   228,   232,   238,   241,
-     244,   251,   261,   288,   291,   292,   295,   298,   311,   312,
-     320,   321,   322,   323,   324,   325,   328,   340,   358,   361,
-     369,   373,   381,   384,   391,   397,   405,   415,   426,   429,
-     430,   433,   447,   451,   464,   465,   466,   467,   468,   469,
-     472,   483,   496,   497,   501,   505,   522,   523,   524,   527,
-     541,   545,   562,   563,   564,   565,   566,   569,   573,   582,
-     596,   633,   637,   641,   645
+       0,   116,   116,   120,   128,   134,   135,   138,   139,   143,
+     146,   150,   155,   158,   159,   162,   171,   179,   189,   192,
+     193,   196,   199,   219,   220,   228,   232,   236,   242,   245,
+     248,   255,   265,   292,   295,   296,   299,   302,   317,   318,
+     326,   327,   328,   329,   330,   331,   334,   346,   366,   369,
+     377,   381,   389,   392,   399,   405,   413,   423,   434,   437,
+     438,   441,   455,   459,   472,   473,   474,   475,   476,   477,
+     480,   491,   504,   505,   509,   513,   530,   531,   532,   535,
+     549,   553,   570,   571,   572,   573,   574,   577,   581,   590,
+     604,   641,   645,   649,   653
 };
 #endif
 
@@ -552,17 +552,17 @@ static const char *const yytname[] =
   "T_COMMA", "T_PERIOD", "T_DOUBLE_PERIOD", "T_LBRACKET", "T_RBRACKET",
   "T_CONST", "T_REPEAT", "T_UNTIL", "T_EQ", "T_DIF", "T_LT", "T_LEQ",
   "T_GT", "T_GEQ", "T_PARAMETER", "T_VOID", "T_INVALID", "$accept",
-  "input", "new_block", "block_body", "opt_constant_definition_part",
-  "opt_variable_definition_part", "star_procedure_definition",
-  "set_procedure_definition", "constant_definition_part",
-  "plus_constant_definition", "constant_definition",
-  "variable_definition_part", "plus_variable_definition",
-  "variable_definition", "variable_group", "star_comma_id", "type",
-  "procedure_definition", "procedure_block", "init_procedure",
-  "opt_brc_formal_parameter_list_brc", "formal_parameter_list",
-  "star_smc_parameter_definition", "parameter_definition",
-  "variable_group_par", "star_comma_id_par", "statement",
-  "assignment_statement", "procedure_statement",
+  "input", "insert_print_procedure", "block_body",
+  "opt_constant_definition_part", "opt_variable_definition_part",
+  "star_procedure_definition", "set_procedure_definition",
+  "constant_definition_part", "plus_constant_definition",
+  "constant_definition", "variable_definition_part",
+  "plus_variable_definition", "variable_definition", "variable_group",
+  "star_comma_id", "type", "procedure_definition", "procedure_block",
+  "init_procedure", "opt_brc_formal_parameter_list_brc",
+  "formal_parameter_list", "star_smc_parameter_definition",
+  "parameter_definition", "variable_group_par", "star_comma_id_par",
+  "statement", "assignment_statement", "procedure_statement",
   "opt_brc_actual_parameter_list_brc", "set_procedure_par",
   "actual_parameter_list", "star_comma_actual_parameter",
   "actual_parameter", "if_statement", "while_statement",
@@ -623,7 +623,7 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     1,     3,     5,     0,     0,     7,
+       0,     3,     0,     0,     1,     0,     5,     0,     0,     7,
        6,     0,    12,    13,     2,     0,     9,     8,     0,    14,
       23,    18,    19,     0,     0,     0,     0,     0,     0,     0,
        0,    20,    21,    40,     4,     0,     9,     5,    31,    15,
@@ -644,7 +644,7 @@ static const yytype_uint8 yydefact[] =
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,     2,     6,     8,     9,    16,    24,    25,    10,    12,
+      -1,     2,     3,     8,     9,    16,    24,    25,    10,    12,
       13,    17,    21,    22,    23,    30,    63,    36,    37,    38,
       58,    87,   124,    88,    89,   121,    47,    48,    49,    65,
       91,   125,   141,   126,    50,    51,    52,    83,   127,   101,
@@ -657,7 +657,7 @@ static const yytype_int16 yydefgoto[] =
 #define YYPACT_NINF -87
 static const yytype_int8 yypact[] =
 {
-      14,    10,    25,    -8,   -87,   -87,   -13,    30,    -2,     7,
+      14,   -87,    13,    22,   -87,    -8,   -13,    30,    -2,     7,
      -87,    -6,   -87,    30,   -87,    37,    35,   -87,    50,   -87,
       12,   -87,    37,    34,    61,    63,    38,    39,    40,    69,
       42,   -87,   -87,    15,   -87,    74,    35,   -13,    41,   -87,
@@ -694,8 +694,8 @@ static const yytype_int8 yypgoto[] =
 static const yytype_int16 yytable[] =
 {
       53,    92,   117,    74,    81,    66,    67,    68,    69,    66,
-      67,    68,    69,     3,   129,   103,   -90,   131,    44,    70,
-      71,     1,   104,   105,    33,     4,    45,     5,     7,    46,
+      67,    68,    69,     4,   129,   103,   -90,   131,    44,    70,
+      71,     1,   104,   105,    33,     5,    45,     6,     7,    46,
       72,    93,   106,    11,    72,    14,   134,    15,    18,    64,
       20,    73,   119,   -11,   133,    73,   143,   132,    29,    53,
      109,   110,   111,   112,    26,    27,    28,   113,    60,    61,
@@ -710,8 +710,8 @@ static const yytype_int16 yytable[] =
 static const yytype_uint8 yycheck[] =
 {
       33,    72,    82,    45,    46,     3,     4,     5,     6,     3,
-       4,     5,     6,     3,    94,    76,    16,   103,     3,    17,
-      18,     7,    17,    18,     9,     0,    11,    35,    41,    14,
+       4,     5,     6,     0,    94,    76,    16,   103,     3,    17,
+      18,     7,    17,    18,     9,     3,    11,    35,    41,    14,
       28,    73,    27,     3,    28,    37,   116,    30,    44,    39,
        3,    39,    84,     8,   115,    39,   132,   108,    36,    82,
       19,    20,    21,    22,     4,     5,     6,    26,    31,    32,
@@ -727,7 +727,7 @@ static const yytype_uint8 yycheck[] =
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     7,    54,     3,     0,    35,    55,    41,    56,    57,
+       0,     7,    54,    55,     0,     3,    35,    41,    56,    57,
       61,     3,    62,    63,    37,    30,    58,    64,    44,    62,
        3,    65,    66,    67,    59,    60,     4,     5,     6,    36,
       68,    65,    35,     9,    89,     8,    70,    71,    72,    35,
@@ -1557,6 +1557,9 @@ yyreduce:
 
     {
 	begin_block();
+	
+	int procedure_print_token2 = insert_procedure_print_token2();
+	insert_procedure_print(procedure_print_token2);
 ;}
     break;
 
@@ -1726,6 +1729,8 @@ yyreduce:
 		arg_token1[i] = (yyvsp[(4) - (4)].token1);
 	}
 	quantidade_arg_adicionados = quantidade_arg;
+	
+	quantidade_arg = 0;
 ;}
     break;
 
@@ -1763,6 +1768,8 @@ yyreduce:
 	
 	if(!check_procedure_usage((yyvsp[(1) - (2)].token2), (yyvsp[(2) - (2)].procedure_info).qtd_argumentos, arg_token1))
 	{
+		printf("procedure %d, qtd_arg %d, arg %d %d\n", (yyvsp[(1) - (2)].token2), (yyvsp[(2) - (2)].procedure_info).qtd_argumentos, arg_token1[0], arg_token1[1]);
+		
 		printf("ERRO: A procedure %s eh utilizada incorretamente na linha %d\n", get_token2_id((yyvsp[(1) - (2)].token2)), get_line());
 		YYERROR;
 	}

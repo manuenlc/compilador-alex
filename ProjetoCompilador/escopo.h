@@ -45,6 +45,7 @@ bool insert_var(int token2, int var_tipo);
 bool insert_parameter(int token2, int parametro_tipo);
 bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumentos);
 bool insert_const(int token2, int const_tipo);
+bool insert_procedure_print(int procedure_print_token2);
 
 void print_current_scope();
 

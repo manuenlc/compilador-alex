@@ -16,9 +16,9 @@ Grammar
 
     0 $accept: input T_EOF
 
-    1 input: T_PROGRAM T_ID T_SEMICOLON new_block block_body T_PERIOD
+    1 input: T_PROGRAM insert_print_procedure T_ID T_SEMICOLON block_body T_PERIOD
 
-    2 new_block: /* empty */
+    2 insert_print_procedure: /* empty */
 
     3 block_body: opt_constant_definition_part opt_variable_definition_part star_procedure_definition compound_statement
 
@@ -222,7 +222,7 @@ $accept (53)
     on left: 0
 input (54)
     on left: 1, on right: 0
-new_block (55)
+insert_print_procedure (55)
     on left: 2, on right: 1
 block_body (56)
     on left: 3, on right: 1 27
@@ -333,9 +333,11 @@ state 0
 
 state 1
 
-    1 input: T_PROGRAM . T_ID T_SEMICOLON new_block block_body T_PERIOD
+    1 input: T_PROGRAM . insert_print_procedure T_ID T_SEMICOLON block_body T_PERIOD
 
-    T_ID  shift, and go to state 3
+    $default  reduce using rule 2 (insert_print_procedure)
+
+    insert_print_procedure  go to state 3
 
 
 state 2
@@ -347,9 +349,9 @@ state 2
 
 state 3
 
-    1 input: T_PROGRAM T_ID . T_SEMICOLON new_block block_body T_PERIOD
+    1 input: T_PROGRAM insert_print_procedure . T_ID T_SEMICOLON block_body T_PERIOD
 
-    T_SEMICOLON  shift, and go to state 5
+    T_ID  shift, and go to state 5
 
 
 state 4
@@ -361,16 +363,14 @@ state 4
 
 state 5
 
-    1 input: T_PROGRAM T_ID T_SEMICOLON . new_block block_body T_PERIOD
+    1 input: T_PROGRAM insert_print_procedure T_ID . T_SEMICOLON block_body T_PERIOD
 
-    $default  reduce using rule 2 (new_block)
-
-    new_block  go to state 6
+    T_SEMICOLON  shift, and go to state 6
 
 
 state 6
 
-    1 input: T_PROGRAM T_ID T_SEMICOLON new_block . block_body T_PERIOD
+    1 input: T_PROGRAM insert_print_procedure T_ID T_SEMICOLON . block_body T_PERIOD
 
     T_CONST  shift, and go to state 7
 
@@ -393,7 +393,7 @@ state 7
 
 state 8
 
-    1 input: T_PROGRAM T_ID T_SEMICOLON new_block block_body . T_PERIOD
+    1 input: T_PROGRAM insert_print_procedure T_ID T_SEMICOLON block_body . T_PERIOD
 
     T_PERIOD  shift, and go to state 14
 
@@ -448,7 +448,7 @@ state 13
 
 state 14
 
-    1 input: T_PROGRAM T_ID T_SEMICOLON new_block block_body T_PERIOD .
+    1 input: T_PROGRAM insert_print_procedure T_ID T_SEMICOLON block_body T_PERIOD .
 
     $default  reduce using rule 1 (input)
 

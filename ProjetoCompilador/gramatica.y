@@ -94,6 +94,7 @@ int procedure_token2;
 %token T_GEQ                  47
 %token T_PARAMETER			  48
 %token T_VOID				  49
+
 %token T_INVALID             255
 
 
@@ -112,12 +113,15 @@ int procedure_token2;
 
 
 %%
-input: T_PROGRAM T_ID T_SEMICOLON new_block block_body T_PERIOD
+input: T_PROGRAM insert_print_procedure T_ID T_SEMICOLON block_body T_PERIOD
 ;
 
-new_block: 
+insert_print_procedure:
 {
 	begin_block();
+	
+	int procedure_print_token2 = insert_procedure_print_token2();
+	insert_procedure_print(procedure_print_token2);
 }
 ;
 
@@ -305,6 +309,8 @@ variable_group_par: T_ID star_comma_id_par T_COLON type
 		arg_token1[i] = $4;
 	}
 	quantidade_arg_adicionados = quantidade_arg;
+	
+	quantidade_arg = 0;
 }
 ;
 
@@ -348,6 +354,8 @@ procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 	
 	if(!check_procedure_usage($1, $2.qtd_argumentos, arg_token1))
 	{
+		printf("procedure %d, qtd_arg %d, arg %d %d\n", $1, $2.qtd_argumentos, arg_token1[0], arg_token1[1]);
+		
 		printf("ERRO: A procedure %s eh utilizada incorretamente na linha %d\n", get_token2_id($1), get_line());
 		YYERROR;
 	}

@@ -1,0 +1,58 @@
+program TesteGeracaoDeCodigo;
+    const
+
+        num1 = 12;
+		num2 = 8;
+
+    procedure euclides_iterativo(n1, n2: integer);  
+		var
+            tmp, max_div_comum: integer;
+			
+    begin
+        
+		print(n1);
+        print(n2);
+        
+		while n2 <> 0 do
+        begin
+            tmp := n1;
+            n1 := n2;
+            n2 := tmp mod n2;
+        end;
+		
+        if n1 < 0 then n1 := -n1;
+        max_div_comum := n1;
+        
+		print(max_div_comum)
+		
+    end;
+    
+    procedure euclides_recursivo(m1, m2: integer);
+    var
+        tmp: integer;
+    begin
+        print(m1);
+        print(m2);
+        if m1 < m2 then 
+        begin
+            tmp := m1;
+            m1 := m2;
+            m2 := tmp
+        end;
+
+        if m1 mod m2 <> 0 then
+            euclides_recursivo(m2, m1 mod m2)
+        else
+            print(m2);
+    end;
+	
+begin
+
+	print(num1);
+    print(num2);
+	
+    if num1 mod 2 = 0 then
+        print(0)
+    else
+        print(1);
+end.

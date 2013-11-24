@@ -38,6 +38,9 @@ int get_line();
 /** retorna a string associada ao token2 de um YYSTYPE */
 char *get_token2_id(int token2);
 
+/** insere e retorna o token 2 da procedure print*/
+int insert_procedure_print_token2();
+
 
 /** funções geradas pelo bison */
 int yylex(void);

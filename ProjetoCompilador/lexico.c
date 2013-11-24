@@ -51,6 +51,8 @@ int get_and_check_token2(char* token_id);
 int get_line();
 char *get_token2_id(int token2);
 
+int insert_procedure_print_token2();
+
 
 /*implementação das funções */
 
@@ -72,6 +74,11 @@ void close_arquivo_fonte()
 int get_line()
 {
 	return linhas_lidas;
+}
+
+int insert_procedure_print_token2()
+{
+	return get_and_check_token2("print");
 }
 
 char *get_token2_id(int token2)
@@ -394,7 +401,7 @@ void go_back_the_char_read()
 char next_char()
 {
 	char c = tolower(fgetc(arquivo_fonte));
-	if(c == '\n') {c = tolower(fgetc(arquivo_fonte)); ++linhas_lidas; /*printf("linha: %d\n", linhas_lidas);*/}
+	if(c == '\n') {c = tolower(fgetc(arquivo_fonte)); ++linhas_lidas; printf("\n");}
 	return c;
 }
 
@@ -429,7 +436,7 @@ int yylex(void)
 {
 	token token_lido = next_token();
 
-	//printf("%d \n", token_lido.token1);
+	printf("%d ", token_lido.token1);
 
 	switch(token_lido.token1)
 	{
