@@ -4,6 +4,7 @@
 #include "tokens.h"
 #include "gramatica.tab.h"
 #include "boolean.h"
+#include "geracao_de_codigo.h"
 
 extern int yyerror(char*);
 extern int yylex(void);
@@ -166,7 +167,9 @@ constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id($1), get_line());
 			YYERROR;
-		}		
+		}
+		
+		wml_generate_int_const_def($3);		
 }
                    | T_ID T_EQ T_REAL_CONST T_SEMICOLON
 {	
@@ -255,9 +258,11 @@ opt_brc_formal_parameter_list_brc:
 {
 	if(!insert_procedure(procedure_token2, 0 , NULL))
 	{
-		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(procedure_token2), get_line());
+		printf("ERRO: Redefinicao da procedure %s na linha %d\n", get_token2_id(procedure_token2), get_line());
 		YYERROR;
 	}
+	
+	wml_generate_procedure(get_token2_id(procedure_token2), procedure_token2, 0);
 	
 	begin_block();
 	
@@ -267,9 +272,11 @@ opt_brc_formal_parameter_list_brc:
 
 	if(!insert_procedure(procedure_token2, quantidade_arg_adicionados, arg_token1))
 	{
-		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(procedure_token2), get_line());
+		printf("ERRO: Redefinicao da procedure %s na linha %d\n", get_token2_id(procedure_token2), get_line());
 		YYERROR;
 	}
+	
+	wml_generate_procedure(get_token2_id(procedure_token2), procedure_token2, quantidade_arg_adicionados);
 	
 	begin_block();
 	
@@ -353,12 +360,12 @@ procedure_statement: T_ID opt_brc_actual_parameter_list_brc
 	
 	
 	if(!check_procedure_usage($1, $2.qtd_argumentos, arg_token1))
-	{
-		printf("procedure %d, qtd_arg %d, arg %d %d\n", $1, $2.qtd_argumentos, arg_token1[0], arg_token1[1]);
-		
+	{		
 		printf("ERRO: A procedure %s eh utilizada incorretamente na linha %d\n", get_token2_id($1), get_line());
 		YYERROR;
 	}
+	
+	
 }
 ;
 

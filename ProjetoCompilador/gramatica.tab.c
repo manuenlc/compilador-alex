@@ -73,6 +73,7 @@
 #include "tokens.h"
 #include "gramatica.tab.h"
 #include "boolean.h"
+#include "geracao_de_codigo.h"
 
 extern int yyerror(char*);
 extern int yylex(void);
@@ -525,16 +526,16 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   116,   116,   120,   128,   134,   135,   138,   139,   143,
-     146,   150,   155,   158,   159,   162,   171,   179,   189,   192,
-     193,   196,   199,   219,   220,   228,   232,   236,   242,   245,
-     248,   255,   265,   292,   295,   296,   299,   302,   317,   318,
-     326,   327,   328,   329,   330,   331,   334,   346,   366,   369,
-     377,   381,   389,   392,   399,   405,   413,   423,   434,   437,
-     438,   441,   455,   459,   472,   473,   474,   475,   476,   477,
-     480,   491,   504,   505,   509,   513,   530,   531,   532,   535,
-     549,   553,   570,   571,   572,   573,   574,   577,   581,   590,
-     604,   641,   645,   649,   653
+       0,   117,   117,   121,   129,   135,   136,   139,   140,   144,
+     147,   151,   156,   159,   160,   163,   174,   182,   192,   195,
+     196,   199,   202,   222,   223,   231,   235,   239,   245,   248,
+     251,   258,   270,   299,   302,   303,   306,   309,   324,   325,
+     333,   334,   335,   336,   337,   338,   341,   353,   373,   376,
+     384,   388,   396,   399,   406,   412,   420,   430,   441,   444,
+     445,   448,   462,   466,   479,   480,   481,   482,   483,   484,
+     487,   498,   511,   512,   516,   520,   537,   538,   539,   542,
+     556,   560,   577,   578,   579,   580,   581,   584,   588,   597,
+     611,   648,   652,   656,   660
 };
 #endif
 
@@ -1592,7 +1593,9 @@ yyreduce:
 		{
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id((yyvsp[(1) - (4)].token2)), get_line());
 			YYERROR;
-		}		
+		}
+		
+		wml_generate_int_const_def((yyvsp[(3) - (4)].token_valor_int));		
 ;}
     break;
 
@@ -1681,9 +1684,11 @@ yyreduce:
     {
 	if(!insert_procedure(procedure_token2, 0 , NULL))
 	{
-		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(procedure_token2), get_line());
+		printf("ERRO: Redefinicao da procedure %s na linha %d\n", get_token2_id(procedure_token2), get_line());
 		YYERROR;
 	}
+	
+	wml_generate_procedure(get_token2_id(procedure_token2), procedure_token2, 0);
 	
 	begin_block();
 	
@@ -1696,9 +1701,11 @@ yyreduce:
 
 	if(!insert_procedure(procedure_token2, quantidade_arg_adicionados, arg_token1))
 	{
-		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(procedure_token2), get_line());
+		printf("ERRO: Redefinicao da procedure %s na linha %d\n", get_token2_id(procedure_token2), get_line());
 		YYERROR;
 	}
+	
+	wml_generate_procedure(get_token2_id(procedure_token2), procedure_token2, quantidade_arg_adicionados);
 	
 	begin_block();
 	
@@ -1767,12 +1774,12 @@ yyreduce:
 	
 	
 	if(!check_procedure_usage((yyvsp[(1) - (2)].token2), (yyvsp[(2) - (2)].procedure_info).qtd_argumentos, arg_token1))
-	{
-		printf("procedure %d, qtd_arg %d, arg %d %d\n", (yyvsp[(1) - (2)].token2), (yyvsp[(2) - (2)].procedure_info).qtd_argumentos, arg_token1[0], arg_token1[1]);
-		
+	{		
 		printf("ERRO: A procedure %s eh utilizada incorretamente na linha %d\n", get_token2_id((yyvsp[(1) - (2)].token2)), get_line());
 		YYERROR;
 	}
+	
+	
 ;}
     break;
 

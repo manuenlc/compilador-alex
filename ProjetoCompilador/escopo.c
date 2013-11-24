@@ -261,15 +261,15 @@ bool insert_procedure(int token2, int quantidade_argumentos, int *tipo_argumento
 
 	if(quantidade_argumentos > 0)
 	{
-		printf("qts de args da proc %d: %d ", token2, quantidade_argumentos);
+		//printf("qts de args da proc %d: %d ", token2, quantidade_argumentos);
 
 		int i;
 		for(i = 0; i < quantidade_argumentos; ++i)
 		{
-			printf("arg %d: %d | ", i + 1, tipo_argumentos[i]);
+			//printf("arg %d: %d | ", i + 1, tipo_argumentos[i]);
 			procurado.tipo_argumentos[i] = tipo_argumentos[i];
 		}
-		printf("\n");
+		//printf("\n");
 	}
 
 	bool achou = search_token2_on_current_scope(token2);

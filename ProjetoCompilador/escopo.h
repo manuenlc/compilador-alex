@@ -15,6 +15,7 @@
 #define LARGURA_ESCOPO_MAX	100
 #define QTD_MAX_PARAMETROS	20
 
+
 typedef struct simbolo
 {
 	int tipo_simbolo; //parameter, const, var, procedure
@@ -26,7 +27,6 @@ typedef struct simbolo
 	int tipo_argumentos[20]; //token 1 do tipo de parametro
 
 } simbolo;
-
 
 void begin_block();
 void end_block();
