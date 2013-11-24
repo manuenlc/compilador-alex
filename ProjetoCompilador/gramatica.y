@@ -175,14 +175,13 @@ plus_constant_definition: constant_definition
 
 constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 {	
+	wml_generate_int_const_def($3);
 		
-		if(!insert_const($1, T_INT_CONST))
-		{
-			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id($1), get_line());
-			YYERROR;
-		}
-		
-		wml_generate_int_const_def($3);		
+	if(!insert_const($1, T_INT_CONST))
+	{
+		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id($1), get_line());
+		YYERROR;
+	}
 }
                    | T_ID T_EQ T_REAL_CONST T_SEMICOLON
 {	
@@ -673,6 +672,7 @@ variable_access: T_ID
 constant: T_INT_CONST
 {
 	$$ = T_INT_CONST;
+	wml_int_const_def_usage($1);
 }
         | T_REAL_CONST
 {

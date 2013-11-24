@@ -23,6 +23,7 @@ typedef struct identificador
 
 
 void wml_generate_int_const_def(int valor_int_const);
+void wml_int_const_def_usage(int valor_int_const);
 //void wml_generate_real_const_def(float real_const_value);
 //void wml_generate_boolean_const_def(bool boolena_const_value);
 
