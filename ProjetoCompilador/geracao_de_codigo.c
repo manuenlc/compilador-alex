@@ -44,6 +44,9 @@ int new_label();
 void push_label(int label);
 int pop_label();
 int read_top_label();
+void print_label(int label);
+
+void wml_tjump_fw(int label);
 
 int get_and_store_procedure_id(char *nome, int token2);
 int get_identifier(int token2, int tipo);
@@ -86,6 +89,11 @@ int pop_label()
 int read_top_label()
 {
 	return pilha_labels[labels_adicionadas - 1];
+}
+
+void print_label(int label)
+{
+	printf("LABEL $%d\n", label);
 }
 
 int get_identifier(int token2, int tipo)
@@ -239,6 +247,11 @@ void wml_procedure_or_program_end()
 void wml_generate_print()
 {
 	printf("CALL_LIB_S 2 5\n");
+}
+
+void wml_tjump_fw(int label)
+{
+	printf("TJUMP_FW_W $%d\n", label);
 }
 
 void wml_operation_usage(int op1_token2, int op2_token2, int operacao)

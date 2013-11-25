@@ -46,6 +46,8 @@ int procedure_token2;
     struct procedure procedure_info;
     struct expressao expressao_info;
     struct t_id t_id_info;
+    
+    int label;
 }
 
 %token T_EOF                  0
@@ -111,6 +113,7 @@ int procedure_token2;
 %type<procedure_info> star_comma_actual_parameter actual_parameter_list opt_brc_actual_parameter_list_brc
 %type<token2> T_ID   
 %type<t_id_info> variable_access constant 
+%type<label> insert_if_label insert_else_label
 %type<token_valor_real> T_REAL_CONST
 %type<token_valor_int> T_INT_CONST
 %type<token_valor_boolean> T_BOOLEAN_CONST
@@ -434,21 +437,45 @@ actual_parameter: expression
 }
 ;
 
-if_statement: T_IF expression T_THEN statement
+if_statement: T_IF expression insert_if_label T_THEN statement
 {
 	if($2 != T_BOOLEAN && $2 != T_BOOLEAN_CONST)
 	{
 		printf("ERRO: A condicao do 'if' na linha %d deve ser um booleano\n", get_line());
 		YYERROR;
 	}
+	
+	print_label($3);
 }
-            | T_IF expression T_THEN statement T_ELSE statement
+            | T_IF expression insert_if_label T_THEN insert_else_label statement
 {
 	if($2 != T_BOOLEAN && $2 != T_BOOLEAN_CONST)
 	{
 		printf("ERRO: A condicao do 'if' na linha %d deve ser um booleano\n", get_line());
 		YYERROR;
 	}
+	
+	print_label($5);
+}
+;
+
+insert_if_label:
+{
+	int label = new_label();
+	wml_tjump_fw(label);
+	push_label(label);
+	$$ = label;
+}
+;
+
+
+insert_else_label: statement T_ELSE 
+{
+	int label2 = new_label();
+	int label1 = pop_label();
+	wml_tjump_fw(label2);
+	print_label(label1);
+	$$ = label2;
 }
 ;
 
