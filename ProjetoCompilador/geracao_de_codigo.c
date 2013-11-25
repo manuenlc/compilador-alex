@@ -29,6 +29,10 @@ void wml_int_const_def_usage(int valor_int_const);
 //void wml_generate_real_const_def(float real_const_value);
 //void wml_generate_boolean_const_def(bool boolena_const_value);
 
+void wml_generate_var_def(int token2);
+void wml_var_usage(int token2);
+void wml_var_assignment(int token2);
+
 void wml_generate_procedure(char *nome, int token2, int qtd_argumentos);
 void wml_procedure_usage(int procedure_token2);
 void wml_procedure_or_program_end();
@@ -146,6 +150,50 @@ void wml_int_const_def_usage(int valor_int_const)
 	printf("LOAD_CONST_S %d\n", qtd_identificador_de_int_const);
 }
 
+void wml_generate_var_def(int token2)
+{
+	int i;
+	for(i = 0; i < qtd_identificador_de_var; ++i)
+	{
+		if(identificador_de_var[i].token2 == token2) return; // Já definido. Não precisa definir de novo.
+	}
+
+	identificador_de_var[qtd_identificador_de_var].id = qtd_identificador_de_var + 1;
+	identificador_de_var[qtd_identificador_de_var].token2 = token2;
+	strcpy(identificador_de_var[qtd_identificador_de_var].nome, get_token2_id(token2));
+
+	printf("incluindo tk2 %d, t_id %d - %s\n", identificador_de_var[qtd_identificador_de_var].token2
+												, identificador_de_var[qtd_identificador_de_var].id
+												, identificador_de_var[qtd_identificador_de_var].nome);
+	++qtd_identificador_de_var;
+}
+
+void wml_var_usage(int token2)
+{
+	int i;
+	for(i = 0; i < qtd_identificador_de_var; ++i)
+	{
+		if(identificador_de_var[i].token2 == token2)
+		{
+			printf("LOAD_VAR_S %d - %s\n", identificador_de_var[i].id, get_token2_id(token2));
+			return ;
+		}
+	}
+}
+
+void wml_var_assignment(int token2)
+{
+	int i;
+	for(i = 0; i < qtd_identificador_de_var; ++i)
+	{
+		if(identificador_de_var[i].token2 == token2)
+		{
+			printf("STORE_VAR_S %d - %s\n", identificador_de_var[i].id, get_token2_id(token2));
+			return ;
+		}
+	}
+}
+
 int get_and_store_procedure_id(char *nome, int token2)
 {
 	identificador_de_procedures[qtd_identificador_de_procedures].id = qtd_identificador_de_procedures + 1;
@@ -182,10 +230,9 @@ void wml_generate_print()
 
 void wml_operation_usage(int op1_token2, int op2_token2, int operacao)
 {
-	if(op2_token2 == T_EOF) return ;
+	//printf("op1 = %d, op2 = %d, op = %d\n", op1_token2, op2_token2, operacao);
 
-	if(op1_token2 != T_VOID) printf("LOAD_X op1 %d\n", op1_token2);
-	if(op1_token2 != T_VOID) printf("LOAD_X op2 %d\n", op2_token2);
+	if(op2_token2 == T_EOF) return ;
 
 	switch(operacao)
 	{
@@ -208,11 +255,13 @@ void wml_operation_usage(int op1_token2, int op2_token2, int operacao)
 		printf("IDIV\n");
 		break;
 	case T_EQ:
-		printf("EQ:\n");
+		printf("EQ\n");
 		break;
 	case T_MINUS:
 		if(op2_token2 == T_VOID) printf("UMINUS\n");
 		else printf("SUB\n");
+		break;
+	case T_EOF:
 		break;
 	default:
 		printf("falta adicionar operacao %d\n", operacao);

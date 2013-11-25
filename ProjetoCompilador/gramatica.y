@@ -31,6 +31,7 @@ int procedure_token2;
 {
 #include "escopo.h"
 #include "tipo.h"
+#include "geracao_de_codigo.h"
 }
 
 %union 
@@ -44,6 +45,7 @@ int procedure_token2;
     
     struct procedure procedure_info;
     struct expressao expressao_info;
+    struct t_id t_id_info;
 }
 
 %token T_EOF                  0
@@ -104,10 +106,11 @@ int procedure_token2;
 
 %right T_THEN T_ELSE
 
-%type<token1> type constant variable_access factor adding_operator term multiplying_operator relational_operator simple_expression expression actual_parameter sign_operator
+%type<token1> type adding_operator multiplying_operator relational_operator expression actual_parameter sign_operator
 %type<expressao_info> star_multiplying_operator_factor star_adding_operator_term opt_relational_operator_simple_expression
 %type<procedure_info> star_comma_actual_parameter actual_parameter_list opt_brc_actual_parameter_list_brc
 %type<token2> T_ID   
+%type<t_id_info> variable_access term constant factor simple_expression
 %type<token_valor_real> T_REAL_CONST
 %type<token_valor_int> T_INT_CONST
 %type<token_valor_boolean> T_BOOLEAN_CONST
@@ -182,6 +185,7 @@ constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id($1), get_line());
 		YYERROR;
 	}
+	
 }
                    | T_ID T_EQ T_REAL_CONST T_SEMICOLON
 {	
@@ -230,6 +234,8 @@ variable_group: T_ID star_comma_id T_COLON type
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(var_token2[i]), get_line());
 			YYERROR;
 		}
+		
+		wml_generate_var_def(var_token2[i]);
 	}
 	quantidade_var = 0;	
 }
@@ -298,7 +304,8 @@ opt_brc_formal_parameter_list_brc:
 	
 	int i;
 	
-	for(i = 0; i < quantidade_arg_adicionados; ++i)
+	//for(i = 0; i < quantidade_arg_adicionados; ++i)
+	for(i = quantidade_arg_adicionados -1 ; i >= 0; --i)
 	{
 		
 		if(!insert_parameter(arg_token2[i], arg_token1[i]))
@@ -306,6 +313,8 @@ opt_brc_formal_parameter_list_brc:
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(arg_token2[i]), get_line());
 			YYERROR;
 		}
+		
+		wml_generate_var_def(arg_token2[i]);
 	}
 	
 	quantidade_arg_adicionados = 0;
@@ -356,11 +365,13 @@ statement:
 
 assignment_statement: variable_access T_ASSIGN expression
 {	
-	if(!check_assignment($1, $3))
+	if(!check_assignment($1.tipo, $3))
 	{
-		printf("ERRO: Nao eh possivel atribuir um %s a um %s na linha %d\n", get_type_name($3), get_type_name($1), get_line());
+		printf("ERRO: Nao eh possivel atribuir um %s a um %s na linha %d\n", get_type_name($3), get_type_name($1.tipo), get_line());
 		YYERROR;
 	}
+	
+	wml_var_assignment($1.token2);
 	
 	uso_de_const = false; // uso de constante no lado direito não é permitido;
 } 
@@ -463,9 +474,9 @@ star_comma_statement:
 
 expression: simple_expression opt_relational_operator_simple_expression
 {
-	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
+	int tipo_resultado = result_type($1.tipo, $2.tipo_operando1, $2.operacao);
 	
-	wml_operation_usage($1, $2.tipo_operando1, $2.operacao);
+	wml_operation_usage($1.tipo, $2.tipo_operando1, $2.operacao);
 		
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
@@ -479,14 +490,16 @@ expression: simple_expression opt_relational_operator_simple_expression
 opt_relational_operator_simple_expression:
 {
 	$$.tipo_operando1 = T_EOF;
+	$$.token2_operando1 = T_EOF;
 	$$.operacao = T_EOF;	
 }
                                          | relational_operator simple_expression
 {
-	$$.tipo_operando1 = $2;
+	$$.tipo_operando1 = $2.tipo;
+	$$.token2_operando1 = $2.token2;
 	$$.operacao = $1;
 		
-	if($1 == T_INVALID || $2 == T_INVALID)
+	if($1 == T_INVALID || $2.tipo == T_INVALID)
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		YYERROR;
@@ -504,9 +517,13 @@ relational_operator: T_LT  { $$ = T_LT;  }
 
 simple_expression: sign_operator term star_adding_operator_term
 {
-	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
+	int tipo_resultado = result_type($2.tipo, $3.tipo_operando1, $3.operacao);
 		
-	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
+	if(tipo_resultado != T_INVALID)
+	{
+		$$.tipo = tipo_resultado;
+		$$.token2 = $2.token2;
+	}
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
@@ -517,9 +534,13 @@ simple_expression: sign_operator term star_adding_operator_term
 }
                  | term star_adding_operator_term
 {
-	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
+	int tipo_resultado = result_type($1.tipo, $2.tipo_operando1, $2.operacao);
 		
-	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
+	if(tipo_resultado != T_INVALID)
+	{
+		$$.tipo = tipo_resultado;
+		$$.token2 = $1.token2;
+	}
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
@@ -535,17 +556,19 @@ sign_operator: T_PLUS { $$ = T_PLUS; }
 star_adding_operator_term:
 {
 	$$.tipo_operando1 = T_EOF;
+	$$.token2_operando1 = T_EOF;
 	$$.operacao = T_EOF;
 }
                          | adding_operator term star_adding_operator_term
 {
-	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
+	int tipo_resultado = result_type($2.tipo, $3.tipo_operando1, $3.operacao);
 	
-	wml_operation_usage($2, $3.tipo_operando1, $3.operacao);
+	wml_operation_usage($2.tipo, $3.tipo_operando1, $3.operacao);
 	
 	if(tipo_resultado != T_INVALID)
 	{
 		$$.tipo_operando1 = tipo_resultado;
+		$$.token2_operando1 = 
 		$$.operacao = $1;
 	}
 	else
@@ -563,11 +586,14 @@ adding_operator: T_PLUS 	{$$ = T_PLUS; }
 
 term: factor star_multiplying_operator_factor
 {
-	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
+	int tipo_resultado = result_type($1.tipo, $2.tipo_operando1, $2.operacao);
 	
-	wml_operation_usage($1, $2.tipo_operando1, $2.operacao);
+	wml_operation_usage($1.tipo, $2.tipo_operando1, $2.operacao);
 		
-	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
+	if(tipo_resultado != T_INVALID)
+	{
+		$$.tipo = tipo_resultado;
+	}
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
@@ -583,11 +609,12 @@ star_multiplying_operator_factor:
 }
                                 | multiplying_operator factor star_multiplying_operator_factor
 {
-	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
+	int tipo_resultado = result_type($2.tipo, $3.tipo_operando1, $3.operacao);
 
 	if(tipo_resultado != T_INVALID)
 	{
 		$$.tipo_operando1 = tipo_resultado;
+		$$.token2_operando1 = $2.token2;
 		$$.operacao = $1;
 	}
 	else
@@ -607,11 +634,16 @@ multiplying_operator: T_TIMES  { $$ = T_TIMES;  }
 
 factor: constant
 {
-	$$ = $1;
+	$$.tipo = $1.tipo;
+	$$.token2 = $1.token2;
 }
       | T_LBRACKET expression T_RBRACKET
 {	
-	if($2 != T_INVALID) $$ = $2;
+	if($2 != T_INVALID)
+	{
+		$$.tipo = $2;
+		//$$.token2 = $2.token2; 
+	}
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
@@ -620,9 +652,9 @@ factor: constant
 }
       | T_NOT factor
 {
-	if($2 == T_BOOLEAN_CONST || $2 == T_BOOLEAN)
+	if($2.tipo == T_BOOLEAN_CONST || $2.tipo == T_BOOLEAN)
 	{
-		$$ = $2;
+		$$.tipo = $2.tipo;
 	}
 	else
 	{
@@ -634,9 +666,10 @@ factor: constant
 
 variable_access: T_ID
 {	
-	$$ = get_token_type($1);
+	$$.tipo = get_token_type($1);
+	$$.token2 = $1;
 	
-	switch($$)
+	switch($$.tipo)
 	{
 	case T_INT_CONST:
 	case T_REAL_CONST:
@@ -671,20 +704,23 @@ variable_access: T_ID
 
 constant: T_INT_CONST
 {
-	$$ = T_INT_CONST;
+	$$.tipo = T_INT_CONST;
 	wml_int_const_def_usage($1);
 }
         | T_REAL_CONST
 {
-	$$ = T_REAL_CONST;
+	$$.tipo = T_REAL_CONST;
 }
         | T_BOOLEAN_CONST
 {
-	$$ = T_BOOLEAN_CONST;
+	$$.tipo = T_BOOLEAN_CONST;
 }
         | variable_access
 {
-	$$ = $1;
+	$$.tipo = $1.tipo;
+	$$.token2 = $1.token2;
+	printf("constant: var_access : ");
+	wml_var_usage($1.token2);
 }
 ;
 %%

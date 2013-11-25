@@ -13,6 +13,7 @@ typedef struct expressao
 {
 	int operacao;
 	int tipo_operando1;
+	int token2_operando1;
 	//int tipo_operando2;
 
 

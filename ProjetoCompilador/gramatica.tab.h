@@ -37,6 +37,7 @@
 
 #include "escopo.h"
 #include "tipo.h"
+#include "geracao_de_codigo.h"
 
 
 
@@ -117,6 +118,7 @@ typedef union YYSTYPE
     
     struct procedure procedure_info;
     struct expressao expressao_info;
+    struct t_id t_id_info;
 
 
 

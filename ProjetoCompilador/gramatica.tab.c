@@ -120,6 +120,7 @@ int procedure_token2;
 
 #include "escopo.h"
 #include "tipo.h"
+#include "geracao_de_codigo.h"
 
 
 
@@ -200,6 +201,7 @@ typedef union YYSTYPE
     
     struct procedure procedure_info;
     struct expressao expressao_info;
+    struct t_id t_id_info;
 
 
 
@@ -527,16 +529,16 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   118,   118,   122,   130,   137,   138,   142,   150,   153,
-     157,   160,   164,   169,   172,   173,   176,   186,   194,   204,
-     207,   208,   211,   214,   238,   239,   247,   251,   255,   261,
-     264,   267,   274,   286,   315,   318,   319,   322,   325,   340,
-     341,   349,   350,   351,   352,   353,   354,   357,   369,   389,
-     392,   400,   404,   412,   415,   422,   428,   436,   446,   457,
-     460,   461,   464,   480,   484,   497,   498,   499,   500,   501,
-     502,   505,   518,   531,   532,   536,   540,   559,   560,   561,
-     564,   580,   584,   601,   602,   603,   604,   605,   608,   612,
-     621,   635,   672,   677,   681,   685
+       0,   121,   121,   125,   133,   140,   141,   145,   153,   156,
+     160,   163,   167,   172,   175,   176,   179,   190,   198,   208,
+     211,   212,   215,   218,   244,   245,   253,   257,   261,   267,
+     270,   273,   280,   292,   324,   327,   328,   331,   334,   349,
+     350,   358,   359,   360,   361,   362,   363,   366,   380,   400,
+     403,   411,   415,   423,   426,   433,   439,   447,   457,   468,
+     471,   472,   475,   491,   496,   510,   511,   512,   513,   514,
+     515,   518,   535,   552,   553,   557,   562,   582,   583,   584,
+     587,   606,   610,   628,   629,   630,   631,   632,   635,   640,
+     653,   667,   705,   710,   714,   718
 };
 #endif
 
@@ -1614,6 +1616,7 @@ yyreduce:
 		printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id((yyvsp[(1) - (4)].token2)), get_line());
 		YYERROR;
 	}
+	
 ;}
     break;
 
@@ -1659,6 +1662,8 @@ yyreduce:
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(var_token2[i]), get_line());
 			YYERROR;
 		}
+		
+		wml_generate_var_def(var_token2[i]);
 	}
 	quantidade_var = 0;	
 ;}
@@ -1733,7 +1738,8 @@ yyreduce:
 	
 	int i;
 	
-	for(i = 0; i < quantidade_arg_adicionados; ++i)
+	//for(i = 0; i < quantidade_arg_adicionados; ++i)
+	for(i = quantidade_arg_adicionados -1 ; i >= 0; --i)
 	{
 		
 		if(!insert_parameter(arg_token2[i], arg_token1[i]))
@@ -1741,6 +1747,8 @@ yyreduce:
 			printf("ERRO: Redefinicao do simbolo %s na linha %d\n", get_token2_id(arg_token2[i]), get_line());
 			YYERROR;
 		}
+		
+		wml_generate_var_def(arg_token2[i]);
 	}
 	
 	quantidade_arg_adicionados = 0;
@@ -1775,11 +1783,13 @@ yyreduce:
   case 47:
 
     {	
-	if(!check_assignment((yyvsp[(1) - (3)].token1), (yyvsp[(3) - (3)].token1)))
+	if(!check_assignment((yyvsp[(1) - (3)].t_id_info).tipo, (yyvsp[(3) - (3)].token1)))
 	{
-		printf("ERRO: Nao eh possivel atribuir um %s a um %s na linha %d\n", get_type_name((yyvsp[(3) - (3)].token1)), get_type_name((yyvsp[(1) - (3)].token1)), get_line());
+		printf("ERRO: Nao eh possivel atribuir um %s a um %s na linha %d\n", get_type_name((yyvsp[(3) - (3)].token1)), get_type_name((yyvsp[(1) - (3)].t_id_info).tipo), get_line());
 		YYERROR;
 	}
+	
+	wml_var_assignment((yyvsp[(1) - (3)].t_id_info).token2);
 	
 	uso_de_const = false; // uso de constante no lado direito não é permitido;
 ;}
@@ -1893,9 +1903,9 @@ yyreduce:
   case 62:
 
     {
-	int tipo_resultado = result_type((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(1) - (2)].t_id_info).tipo, (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
 	
-	wml_operation_usage((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	wml_operation_usage((yyvsp[(1) - (2)].t_id_info).tipo, (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
 		
 	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
 	else
@@ -1910,6 +1920,7 @@ yyreduce:
 
     {
 	(yyval.expressao_info).tipo_operando1 = T_EOF;
+	(yyval.expressao_info).token2_operando1 = T_EOF;
 	(yyval.expressao_info).operacao = T_EOF;	
 ;}
     break;
@@ -1917,10 +1928,11 @@ yyreduce:
   case 64:
 
     {
-	(yyval.expressao_info).tipo_operando1 = (yyvsp[(2) - (2)].token1);
+	(yyval.expressao_info).tipo_operando1 = (yyvsp[(2) - (2)].t_id_info).tipo;
+	(yyval.expressao_info).token2_operando1 = (yyvsp[(2) - (2)].t_id_info).token2;
 	(yyval.expressao_info).operacao = (yyvsp[(1) - (2)].token1);
 		
-	if((yyvsp[(1) - (2)].token1) == T_INVALID || (yyvsp[(2) - (2)].token1) == T_INVALID)
+	if((yyvsp[(1) - (2)].token1) == T_INVALID || (yyvsp[(2) - (2)].t_id_info).tipo == T_INVALID)
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		YYERROR;
@@ -1961,9 +1973,13 @@ yyreduce:
   case 71:
 
     {
-	int tipo_resultado = result_type((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(2) - (3)].t_id_info).tipo, (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
 		
-	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
+	if(tipo_resultado != T_INVALID)
+	{
+		(yyval.t_id_info).tipo = tipo_resultado;
+		(yyval.t_id_info).token2 = (yyvsp[(2) - (3)].t_id_info).token2;
+	}
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
@@ -1977,9 +1993,13 @@ yyreduce:
   case 72:
 
     {
-	int tipo_resultado = result_type((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(1) - (2)].t_id_info).tipo, (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
 		
-	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
+	if(tipo_resultado != T_INVALID)
+	{
+		(yyval.t_id_info).tipo = tipo_resultado;
+		(yyval.t_id_info).token2 = (yyvsp[(1) - (2)].t_id_info).token2;
+	}
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
@@ -2002,6 +2022,7 @@ yyreduce:
 
     {
 	(yyval.expressao_info).tipo_operando1 = T_EOF;
+	(yyval.expressao_info).token2_operando1 = T_EOF;
 	(yyval.expressao_info).operacao = T_EOF;
 ;}
     break;
@@ -2009,13 +2030,14 @@ yyreduce:
   case 76:
 
     {
-	int tipo_resultado = result_type((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(2) - (3)].t_id_info).tipo, (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
 	
-	wml_operation_usage((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
+	wml_operation_usage((yyvsp[(2) - (3)].t_id_info).tipo, (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
 	
 	if(tipo_resultado != T_INVALID)
 	{
 		(yyval.expressao_info).tipo_operando1 = tipo_resultado;
+		(yyval.expressao_info).token2_operando1 = 
 		(yyval.expressao_info).operacao = (yyvsp[(1) - (3)].token1);
 	}
 	else
@@ -2044,11 +2066,14 @@ yyreduce:
   case 80:
 
     {
-	int tipo_resultado = result_type((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(1) - (2)].t_id_info).tipo, (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
 	
-	wml_operation_usage((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	wml_operation_usage((yyvsp[(1) - (2)].t_id_info).tipo, (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
 		
-	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
+	if(tipo_resultado != T_INVALID)
+	{
+		(yyval.t_id_info).tipo = tipo_resultado;
+	}
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
@@ -2068,11 +2093,12 @@ yyreduce:
   case 82:
 
     {
-	int tipo_resultado = result_type((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(2) - (3)].t_id_info).tipo, (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
 
 	if(tipo_resultado != T_INVALID)
 	{
 		(yyval.expressao_info).tipo_operando1 = tipo_resultado;
+		(yyval.expressao_info).token2_operando1 = (yyvsp[(2) - (3)].t_id_info).token2;
 		(yyval.expressao_info).operacao = (yyvsp[(1) - (3)].token1);
 	}
 	else
@@ -2111,14 +2137,19 @@ yyreduce:
   case 88:
 
     {
-	(yyval.token1) = (yyvsp[(1) - (1)].token1);
+	(yyval.t_id_info).tipo = (yyvsp[(1) - (1)].t_id_info).tipo;
+	(yyval.t_id_info).token2 = (yyvsp[(1) - (1)].t_id_info).token2;
 ;}
     break;
 
   case 89:
 
     {	
-	if((yyvsp[(2) - (3)].token1) != T_INVALID) (yyval.token1) = (yyvsp[(2) - (3)].token1);
+	if((yyvsp[(2) - (3)].token1) != T_INVALID)
+	{
+		(yyval.t_id_info).tipo = (yyvsp[(2) - (3)].token1);
+		//$$.token2 = $2.token2; 
+	}
 	else
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
@@ -2130,9 +2161,9 @@ yyreduce:
   case 90:
 
     {
-	if((yyvsp[(2) - (2)].token1) == T_BOOLEAN_CONST || (yyvsp[(2) - (2)].token1) == T_BOOLEAN)
+	if((yyvsp[(2) - (2)].t_id_info).tipo == T_BOOLEAN_CONST || (yyvsp[(2) - (2)].t_id_info).tipo == T_BOOLEAN)
 	{
-		(yyval.token1) = (yyvsp[(2) - (2)].token1);
+		(yyval.t_id_info).tipo = (yyvsp[(2) - (2)].t_id_info).tipo;
 	}
 	else
 	{
@@ -2145,9 +2176,10 @@ yyreduce:
   case 91:
 
     {	
-	(yyval.token1) = get_token_type((yyvsp[(1) - (1)].token2));
+	(yyval.t_id_info).tipo = get_token_type((yyvsp[(1) - (1)].token2));
+	(yyval.t_id_info).token2 = (yyvsp[(1) - (1)].token2);
 	
-	switch((yyval.token1))
+	switch((yyval.t_id_info).tipo)
 	{
 	case T_INT_CONST:
 	case T_REAL_CONST:
@@ -2183,7 +2215,7 @@ yyreduce:
   case 92:
 
     {
-	(yyval.token1) = T_INT_CONST;
+	(yyval.t_id_info).tipo = T_INT_CONST;
 	wml_int_const_def_usage((yyvsp[(1) - (1)].token_valor_int));
 ;}
     break;
@@ -2191,21 +2223,24 @@ yyreduce:
   case 93:
 
     {
-	(yyval.token1) = T_REAL_CONST;
+	(yyval.t_id_info).tipo = T_REAL_CONST;
 ;}
     break;
 
   case 94:
 
     {
-	(yyval.token1) = T_BOOLEAN_CONST;
+	(yyval.t_id_info).tipo = T_BOOLEAN_CONST;
 ;}
     break;
 
   case 95:
 
     {
-	(yyval.token1) = (yyvsp[(1) - (1)].token1);
+	(yyval.t_id_info).tipo = (yyvsp[(1) - (1)].t_id_info).tipo;
+	(yyval.t_id_info).token2 = (yyvsp[(1) - (1)].t_id_info).token2;
+	printf("constant: var_access : ");
+	wml_var_usage((yyvsp[(1) - (1)].t_id_info).token2);
 ;}
     break;
 

@@ -21,11 +21,23 @@ typedef struct identificador
 
 } identificador;
 
+typedef struct t_id
+{
+	int token2;
+	int tipo;
+
+} t_id;
+
+
 
 void wml_generate_int_const_def(int valor_int_const);
 void wml_int_const_def_usage(int valor_int_const);
 //void wml_generate_real_const_def(float real_const_value);
 //void wml_generate_boolean_const_def(bool boolena_const_value);
+
+void wml_generate_var_def(int token2);
+void wml_var_usage(int token2);
+void wml_var_assignment(int token2);
 
 void wml_generate_procedure(char *nome, int token2, int qtd_argumentos);
 void wml_allocate_procedure_vars(int qtd_var_alocadas);
@@ -38,12 +50,6 @@ int new_label();
 void push_label(int label);
 int pop_label();
 int read_top_label();
-
-
-void wml_generate_print();
-void wml_generate_add();
-void wml_generate_ne();
-void wml_generate_lt();
 
 
 /*
