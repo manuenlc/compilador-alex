@@ -106,11 +106,11 @@ int procedure_token2;
 
 %right T_THEN T_ELSE
 
-%type<token1> type adding_operator multiplying_operator relational_operator expression actual_parameter sign_operator
+%type<token1> type adding_operator multiplying_operator relational_operator expression actual_parameter sign_operator term simple_expression factor
 %type<expressao_info> star_multiplying_operator_factor star_adding_operator_term opt_relational_operator_simple_expression
 %type<procedure_info> star_comma_actual_parameter actual_parameter_list opt_brc_actual_parameter_list_brc
 %type<token2> T_ID   
-%type<t_id_info> variable_access term constant factor simple_expression
+%type<t_id_info> variable_access constant 
 %type<token_valor_real> T_REAL_CONST
 %type<token_valor_int> T_INT_CONST
 %type<token_valor_boolean> T_BOOLEAN_CONST
@@ -221,8 +221,6 @@ variable_group: T_ID star_comma_id T_COLON type
 	++quantidade_var;
 	
 	quantidade_var_alocadas += quantidade_var; 
-	
-	printf("inc qtd_var_alloc %d\n", quantidade_var_alocadas);
 	
 	int i;
 	
@@ -474,9 +472,9 @@ star_comma_statement:
 
 expression: simple_expression opt_relational_operator_simple_expression
 {
-	int tipo_resultado = result_type($1.tipo, $2.tipo_operando1, $2.operacao);
+	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
 	
-	wml_operation_usage($1.tipo, $2.tipo_operando1, $2.operacao);
+	wml_operation_usage($1, $2.tipo_operando1, $2.operacao);
 		
 	if(tipo_resultado != T_INVALID) $$ = tipo_resultado;
 	else
@@ -490,16 +488,14 @@ expression: simple_expression opt_relational_operator_simple_expression
 opt_relational_operator_simple_expression:
 {
 	$$.tipo_operando1 = T_EOF;
-	$$.token2_operando1 = T_EOF;
 	$$.operacao = T_EOF;	
 }
                                          | relational_operator simple_expression
 {
-	$$.tipo_operando1 = $2.tipo;
-	$$.token2_operando1 = $2.token2;
+	$$.tipo_operando1 = $2;
 	$$.operacao = $1;
 		
-	if($1 == T_INVALID || $2.tipo == T_INVALID)
+	if($1 == T_INVALID || $2 == T_INVALID)
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		YYERROR;
@@ -517,12 +513,11 @@ relational_operator: T_LT  { $$ = T_LT;  }
 
 simple_expression: sign_operator term star_adding_operator_term
 {
-	int tipo_resultado = result_type($2.tipo, $3.tipo_operando1, $3.operacao);
+	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
 		
 	if(tipo_resultado != T_INVALID)
 	{
-		$$.tipo = tipo_resultado;
-		$$.token2 = $2.token2;
+		$$ = tipo_resultado;
 	}
 	else
 	{
@@ -534,12 +529,11 @@ simple_expression: sign_operator term star_adding_operator_term
 }
                  | term star_adding_operator_term
 {
-	int tipo_resultado = result_type($1.tipo, $2.tipo_operando1, $2.operacao);
+	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
 		
 	if(tipo_resultado != T_INVALID)
 	{
-		$$.tipo = tipo_resultado;
-		$$.token2 = $1.token2;
+		$$ = tipo_resultado;
 	}
 	else
 	{
@@ -561,14 +555,13 @@ star_adding_operator_term:
 }
                          | adding_operator term star_adding_operator_term
 {
-	int tipo_resultado = result_type($2.tipo, $3.tipo_operando1, $3.operacao);
+	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
 	
-	wml_operation_usage($2.tipo, $3.tipo_operando1, $3.operacao);
+	wml_operation_usage($2, $3.tipo_operando1, $3.operacao);
 	
 	if(tipo_resultado != T_INVALID)
 	{
 		$$.tipo_operando1 = tipo_resultado;
-		$$.token2_operando1 = 
 		$$.operacao = $1;
 	}
 	else
@@ -586,13 +579,13 @@ adding_operator: T_PLUS 	{$$ = T_PLUS; }
 
 term: factor star_multiplying_operator_factor
 {
-	int tipo_resultado = result_type($1.tipo, $2.tipo_operando1, $2.operacao);
+	int tipo_resultado = result_type($1, $2.tipo_operando1, $2.operacao);
 	
-	wml_operation_usage($1.tipo, $2.tipo_operando1, $2.operacao);
+	wml_operation_usage($1, $2.tipo_operando1, $2.operacao);
 		
 	if(tipo_resultado != T_INVALID)
 	{
-		$$.tipo = tipo_resultado;
+		$$ = tipo_resultado;
 	}
 	else
 	{
@@ -609,12 +602,11 @@ star_multiplying_operator_factor:
 }
                                 | multiplying_operator factor star_multiplying_operator_factor
 {
-	int tipo_resultado = result_type($2.tipo, $3.tipo_operando1, $3.operacao);
+	int tipo_resultado = result_type($2, $3.tipo_operando1, $3.operacao);
 
 	if(tipo_resultado != T_INVALID)
 	{
 		$$.tipo_operando1 = tipo_resultado;
-		$$.token2_operando1 = $2.token2;
 		$$.operacao = $1;
 	}
 	else
@@ -634,15 +626,13 @@ multiplying_operator: T_TIMES  { $$ = T_TIMES;  }
 
 factor: constant
 {
-	$$.tipo = $1.tipo;
-	$$.token2 = $1.token2;
+	$$ = $1.tipo;
 }
       | T_LBRACKET expression T_RBRACKET
 {	
 	if($2 != T_INVALID)
 	{
-		$$.tipo = $2;
-		//$$.token2 = $2.token2; 
+		$$ = $2;
 	}
 	else
 	{
@@ -652,9 +642,9 @@ factor: constant
 }
       | T_NOT factor
 {
-	if($2.tipo == T_BOOLEAN_CONST || $2.tipo == T_BOOLEAN)
+	if($2 == T_BOOLEAN_CONST || $2 == T_BOOLEAN)
 	{
-		$$.tipo = $2.tipo;
+		$$ = $2;
 	}
 	else
 	{
@@ -719,7 +709,6 @@ constant: T_INT_CONST
 {
 	$$.tipo = $1.tipo;
 	$$.token2 = $1.token2;
-	printf("tipo var_access %d\n", $1.tipo);
 	
 	if($1.tipo == T_INT_CONST || $1.tipo == T_REAL_CONST || $1.tipo == T_BOOLEAN_CONST)
 	{

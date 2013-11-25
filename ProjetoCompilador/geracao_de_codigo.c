@@ -178,9 +178,6 @@ void wml_generate_var_def(int token2)
 	identificador_de_var[qtd_identificador_de_var].token2 = token2;
 	strcpy(identificador_de_var[qtd_identificador_de_var].nome, get_token2_id(token2));
 
-	printf("incluindo tk2 %d, t_id %d - %s\n", identificador_de_var[qtd_identificador_de_var].token2
-												, identificador_de_var[qtd_identificador_de_var].id
-												, identificador_de_var[qtd_identificador_de_var].nome);
 	++qtd_identificador_de_var;
 }
 

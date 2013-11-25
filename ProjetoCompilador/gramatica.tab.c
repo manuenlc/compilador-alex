@@ -531,14 +531,14 @@ static const yytype_uint16 yyrline[] =
 {
        0,   121,   121,   125,   133,   140,   141,   145,   153,   156,
      160,   163,   167,   172,   175,   176,   179,   190,   198,   208,
-     211,   212,   215,   218,   244,   245,   253,   257,   261,   267,
-     270,   273,   280,   292,   324,   327,   328,   331,   334,   349,
-     350,   358,   359,   360,   361,   362,   363,   366,   380,   400,
-     403,   411,   415,   423,   426,   433,   439,   447,   457,   468,
-     471,   472,   475,   491,   496,   510,   511,   512,   513,   514,
-     515,   518,   535,   552,   553,   557,   562,   582,   583,   584,
-     587,   606,   610,   628,   629,   630,   631,   632,   635,   640,
-     653,   667,   705,   710,   714,   718
+     211,   212,   215,   218,   242,   243,   251,   255,   259,   265,
+     268,   271,   278,   290,   322,   325,   326,   329,   332,   347,
+     348,   356,   357,   358,   359,   360,   361,   364,   378,   398,
+     401,   409,   413,   421,   424,   431,   437,   445,   455,   466,
+     469,   470,   473,   489,   493,   506,   507,   508,   509,   510,
+     511,   514,   530,   546,   547,   551,   556,   575,   576,   577,
+     580,   599,   603,   620,   621,   622,   623,   624,   627,   631,
+     643,   657,   695,   700,   704,   708
 };
 #endif
 
@@ -1650,8 +1650,6 @@ yyreduce:
 	
 	quantidade_var_alocadas += quantidade_var; 
 	
-	printf("inc qtd_var_alloc %d\n", quantidade_var_alocadas);
-	
 	int i;
 	
 	 
@@ -1903,9 +1901,9 @@ yyreduce:
   case 62:
 
     {
-	int tipo_resultado = result_type((yyvsp[(1) - (2)].t_id_info).tipo, (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
 	
-	wml_operation_usage((yyvsp[(1) - (2)].t_id_info).tipo, (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	wml_operation_usage((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
 		
 	if(tipo_resultado != T_INVALID) (yyval.token1) = tipo_resultado;
 	else
@@ -1920,7 +1918,6 @@ yyreduce:
 
     {
 	(yyval.expressao_info).tipo_operando1 = T_EOF;
-	(yyval.expressao_info).token2_operando1 = T_EOF;
 	(yyval.expressao_info).operacao = T_EOF;	
 ;}
     break;
@@ -1928,11 +1925,10 @@ yyreduce:
   case 64:
 
     {
-	(yyval.expressao_info).tipo_operando1 = (yyvsp[(2) - (2)].t_id_info).tipo;
-	(yyval.expressao_info).token2_operando1 = (yyvsp[(2) - (2)].t_id_info).token2;
+	(yyval.expressao_info).tipo_operando1 = (yyvsp[(2) - (2)].token1);
 	(yyval.expressao_info).operacao = (yyvsp[(1) - (2)].token1);
 		
-	if((yyvsp[(1) - (2)].token1) == T_INVALID || (yyvsp[(2) - (2)].t_id_info).tipo == T_INVALID)
+	if((yyvsp[(1) - (2)].token1) == T_INVALID || (yyvsp[(2) - (2)].token1) == T_INVALID)
 	{
 		printf("ERRO: Operacao invalida na linha %d\n", get_line());
 		YYERROR;
@@ -1973,12 +1969,11 @@ yyreduce:
   case 71:
 
     {
-	int tipo_resultado = result_type((yyvsp[(2) - (3)].t_id_info).tipo, (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
 		
 	if(tipo_resultado != T_INVALID)
 	{
-		(yyval.t_id_info).tipo = tipo_resultado;
-		(yyval.t_id_info).token2 = (yyvsp[(2) - (3)].t_id_info).token2;
+		(yyval.token1) = tipo_resultado;
 	}
 	else
 	{
@@ -1993,12 +1988,11 @@ yyreduce:
   case 72:
 
     {
-	int tipo_resultado = result_type((yyvsp[(1) - (2)].t_id_info).tipo, (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
 		
 	if(tipo_resultado != T_INVALID)
 	{
-		(yyval.t_id_info).tipo = tipo_resultado;
-		(yyval.t_id_info).token2 = (yyvsp[(1) - (2)].t_id_info).token2;
+		(yyval.token1) = tipo_resultado;
 	}
 	else
 	{
@@ -2030,14 +2024,13 @@ yyreduce:
   case 76:
 
     {
-	int tipo_resultado = result_type((yyvsp[(2) - (3)].t_id_info).tipo, (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
 	
-	wml_operation_usage((yyvsp[(2) - (3)].t_id_info).tipo, (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
+	wml_operation_usage((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
 	
 	if(tipo_resultado != T_INVALID)
 	{
 		(yyval.expressao_info).tipo_operando1 = tipo_resultado;
-		(yyval.expressao_info).token2_operando1 = 
 		(yyval.expressao_info).operacao = (yyvsp[(1) - (3)].token1);
 	}
 	else
@@ -2066,13 +2059,13 @@ yyreduce:
   case 80:
 
     {
-	int tipo_resultado = result_type((yyvsp[(1) - (2)].t_id_info).tipo, (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
 	
-	wml_operation_usage((yyvsp[(1) - (2)].t_id_info).tipo, (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
+	wml_operation_usage((yyvsp[(1) - (2)].token1), (yyvsp[(2) - (2)].expressao_info).tipo_operando1, (yyvsp[(2) - (2)].expressao_info).operacao);
 		
 	if(tipo_resultado != T_INVALID)
 	{
-		(yyval.t_id_info).tipo = tipo_resultado;
+		(yyval.token1) = tipo_resultado;
 	}
 	else
 	{
@@ -2093,12 +2086,11 @@ yyreduce:
   case 82:
 
     {
-	int tipo_resultado = result_type((yyvsp[(2) - (3)].t_id_info).tipo, (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
+	int tipo_resultado = result_type((yyvsp[(2) - (3)].token1), (yyvsp[(3) - (3)].expressao_info).tipo_operando1, (yyvsp[(3) - (3)].expressao_info).operacao);
 
 	if(tipo_resultado != T_INVALID)
 	{
 		(yyval.expressao_info).tipo_operando1 = tipo_resultado;
-		(yyval.expressao_info).token2_operando1 = (yyvsp[(2) - (3)].t_id_info).token2;
 		(yyval.expressao_info).operacao = (yyvsp[(1) - (3)].token1);
 	}
 	else
@@ -2137,8 +2129,7 @@ yyreduce:
   case 88:
 
     {
-	(yyval.t_id_info).tipo = (yyvsp[(1) - (1)].t_id_info).tipo;
-	(yyval.t_id_info).token2 = (yyvsp[(1) - (1)].t_id_info).token2;
+	(yyval.token1) = (yyvsp[(1) - (1)].t_id_info).tipo;
 ;}
     break;
 
@@ -2147,8 +2138,7 @@ yyreduce:
     {	
 	if((yyvsp[(2) - (3)].token1) != T_INVALID)
 	{
-		(yyval.t_id_info).tipo = (yyvsp[(2) - (3)].token1);
-		//$$.token2 = $2.token2; 
+		(yyval.token1) = (yyvsp[(2) - (3)].token1);
 	}
 	else
 	{
@@ -2161,9 +2151,9 @@ yyreduce:
   case 90:
 
     {
-	if((yyvsp[(2) - (2)].t_id_info).tipo == T_BOOLEAN_CONST || (yyvsp[(2) - (2)].t_id_info).tipo == T_BOOLEAN)
+	if((yyvsp[(2) - (2)].token1) == T_BOOLEAN_CONST || (yyvsp[(2) - (2)].token1) == T_BOOLEAN)
 	{
-		(yyval.t_id_info).tipo = (yyvsp[(2) - (2)].t_id_info).tipo;
+		(yyval.token1) = (yyvsp[(2) - (2)].token1);
 	}
 	else
 	{
@@ -2239,7 +2229,6 @@ yyreduce:
     {
 	(yyval.t_id_info).tipo = (yyvsp[(1) - (1)].t_id_info).tipo;
 	(yyval.t_id_info).token2 = (yyvsp[(1) - (1)].t_id_info).token2;
-	printf("tipo var_access %d\n", (yyvsp[(1) - (1)].t_id_info).tipo);
 	
 	if((yyvsp[(1) - (1)].t_id_info).tipo == T_INT_CONST || (yyvsp[(1) - (1)].t_id_info).tipo == T_REAL_CONST || (yyvsp[(1) - (1)].t_id_info).tipo == T_BOOLEAN_CONST)
 	{
