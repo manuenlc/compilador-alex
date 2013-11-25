@@ -267,7 +267,7 @@ void wml_operation_usage(int op1_token2, int op2_token2, int operacao)
 
 	switch(operacao)
 	{
-	case T_AND:
+	case T_PLUS:
 		printf("ADD\n");
 		break;
 	case T_DIF:
