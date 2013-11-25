@@ -61,6 +61,7 @@ int read_top_label();
 void print_label(int label);
 
 void wml_tjump_fw(int label);
+void wml_jump_bw(int label);
 
 
 /*

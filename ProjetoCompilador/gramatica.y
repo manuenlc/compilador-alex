@@ -113,7 +113,7 @@ int procedure_token2;
 %type<procedure_info> star_comma_actual_parameter actual_parameter_list opt_brc_actual_parameter_list_brc
 %type<token2> T_ID   
 %type<t_id_info> variable_access constant 
-%type<label> insert_if_label insert_else_label
+%type<label> insert_if_label insert_else_label insert_while_label insert_do_label
 %type<token_valor_real> T_REAL_CONST
 %type<token_valor_int> T_INT_CONST
 %type<token_valor_boolean> T_BOOLEAN_CONST
@@ -479,13 +479,32 @@ insert_else_label: statement T_ELSE
 }
 ;
 
-while_statement: T_WHILE expression T_DO statement
+while_statement: insert_while_label T_WHILE expression insert_do_label statement
 {
-	if($2 != T_BOOLEAN && $2 != T_BOOLEAN_CONST)
+	if($3 != T_BOOLEAN && $3 != T_BOOLEAN_CONST)
 	{
 		printf("ERRO: A condicao do 'while' na linha %d deve ser um booleano\n", get_line());
 		YYERROR;
 	}
+	
+	wml_jump_bw($1);
+	print_label($4);
+}
+;
+
+insert_while_label:
+{
+	int label = new_label();
+	print_label(label);
+	$$ = label;
+}
+;
+
+insert_do_label: T_DO
+{
+	int label = new_label();
+	wml_tjump_fw(label);
+	$$ = label;
 }
 ;
 
