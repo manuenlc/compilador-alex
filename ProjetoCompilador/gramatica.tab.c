@@ -540,8 +540,8 @@ static const yytype_uint16 yyrline[] =
      404,   412,   416,   424,   427,   434,   440,   450,   463,   472,
      482,   496,   503,   512,   515,   516,   519,   535,   539,   552,
      553,   554,   555,   556,   557,   560,   576,   592,   593,   597,
-     602,   621,   622,   623,   626,   645,   649,   666,   667,   668,
-     669,   670,   673,   677,   689,   703,   741,   746,   750,   754
+     601,   620,   621,   622,   625,   644,   648,   665,   666,   667,
+     668,   669,   672,   676,   688,   704,   742,   747,   751,   755
 };
 #endif
 
@@ -2067,7 +2067,6 @@ yyreduce:
 
     {
 	(yyval.expressao_info).tipo_operando1 = T_EOF;
-	(yyval.expressao_info).token2_operando1 = T_EOF;
 	(yyval.expressao_info).operacao = T_EOF;
 ;}
     break;
@@ -2211,6 +2210,8 @@ yyreduce:
 		printf("ERRO: utilizacao incorreta de 'not' na linha %d", get_line());
 		YYERROR;
 	}
+	
+	wml_operation_usage((yyvsp[(2) - (2)].token1), T_VOID, (yyvsp[(1) - (2)].token1));
 ;}
     break;
 

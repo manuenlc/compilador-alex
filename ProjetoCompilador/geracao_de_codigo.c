@@ -197,7 +197,8 @@ void wml_var_usage(int token2)
 	{
 		if(identificador_de_var[i].token2 == token2)
 		{
-			printf("LOAD_VAR_S %d - %s\n", identificador_de_var[i].id, get_token2_id(token2));
+			printf("LOAD_VAR_S %d\n", identificador_de_var[i].id);
+			//printf("LOAD_VAR_S %d - %s\n", identificador_de_var[i].id, get_token2_id(token2));
 			return ;
 		}
 	}
@@ -210,7 +211,8 @@ void wml_var_assignment(int token2)
 	{
 		if(identificador_de_var[i].token2 == token2)
 		{
-			printf("STORE_VAR_S %d - %s\n", identificador_de_var[i].id, get_token2_id(token2));
+			printf("STORE_VAR_S %d\n", identificador_de_var[i].id);
+			//printf("STORE_VAR_S %d - %s\n", identificador_de_var[i].id, get_token2_id(token2));
 			return ;
 		}
 	}
@@ -293,6 +295,9 @@ void wml_operation_usage(int op1_token2, int op2_token2, int operacao)
 		else printf("SUB\n");
 		break;
 	case T_EOF:
+		break;
+	case T_NOT:
+		printf("NOT\n");
 		break;
 	default:
 		printf("falta adicionar operacao %d\n", operacao);

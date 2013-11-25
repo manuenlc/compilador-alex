@@ -108,7 +108,7 @@ int procedure_token2;
 
 %right T_THEN T_ELSE
 
-%type<token1> type adding_operator multiplying_operator relational_operator expression actual_parameter sign_operator term simple_expression factor
+%type<token1> type adding_operator multiplying_operator relational_operator expression actual_parameter sign_operator term simple_expression factor T_NOT
 %type<expressao_info> star_multiplying_operator_factor star_adding_operator_term opt_relational_operator_simple_expression
 %type<procedure_info> star_comma_actual_parameter actual_parameter_list opt_brc_actual_parameter_list_brc
 %type<token2> T_ID   
@@ -596,7 +596,6 @@ sign_operator: T_PLUS { $$ = T_PLUS; }
 star_adding_operator_term:
 {
 	$$.tipo_operando1 = T_EOF;
-	$$.token2_operando1 = T_EOF;
 	$$.operacao = T_EOF;
 }
                          | adding_operator term star_adding_operator_term
@@ -697,6 +696,8 @@ factor: constant
 		printf("ERRO: utilizacao incorreta de 'not' na linha %d", get_line());
 		YYERROR;
 	}
+	
+	wml_operation_usage($2, T_VOID, $1);
 }
 ;
 
