@@ -1609,7 +1609,7 @@ yyreduce:
   case 16:
 
     {	
-	wml_generate_int_const_def((yyvsp[(3) - (4)].token_valor_int));
+	wml_generate_int_const_def((yyvsp[(3) - (4)].token_valor_int), (yyvsp[(1) - (4)].token2));
 		
 	if(!insert_const((yyvsp[(1) - (4)].token2), T_INT_CONST))
 	{
@@ -2216,7 +2216,7 @@ yyreduce:
 
     {
 	(yyval.t_id_info).tipo = T_INT_CONST;
-	wml_int_const_def_usage((yyvsp[(1) - (1)].token_valor_int));
+	wml_int_const_def_usage((yyvsp[(1) - (1)].token_valor_int), T_EOF);
 ;}
     break;
 
@@ -2239,8 +2239,16 @@ yyreduce:
     {
 	(yyval.t_id_info).tipo = (yyvsp[(1) - (1)].t_id_info).tipo;
 	(yyval.t_id_info).token2 = (yyvsp[(1) - (1)].t_id_info).token2;
-	printf("constant: var_access : ");
-	wml_var_usage((yyvsp[(1) - (1)].t_id_info).token2);
+	printf("tipo var_access %d\n", (yyvsp[(1) - (1)].t_id_info).tipo);
+	
+	if((yyvsp[(1) - (1)].t_id_info).tipo == T_INT_CONST || (yyvsp[(1) - (1)].t_id_info).tipo == T_REAL_CONST || (yyvsp[(1) - (1)].t_id_info).tipo == T_BOOLEAN_CONST)
+	{
+		wml_int_const_def_usage(T_VOID, (yyvsp[(1) - (1)].t_id_info).token2);
+		
+	} else
+	{
+		wml_var_usage((yyvsp[(1) - (1)].t_id_info).token2);
+	}
 ;}
     break;
 

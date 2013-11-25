@@ -21,6 +21,14 @@ typedef struct identificador
 
 } identificador;
 
+typedef struct int_const
+{
+	int id;
+	int token2;
+	int valor;
+
+} int_const;
+
 typedef struct t_id
 {
 	int token2;
@@ -30,8 +38,8 @@ typedef struct t_id
 
 
 
-void wml_generate_int_const_def(int valor_int_const);
-void wml_int_const_def_usage(int valor_int_const);
+void wml_generate_int_const_def(int valor_int_const, int token2);
+void wml_int_const_def_usage(int valor_int_const, int token2);
 //void wml_generate_real_const_def(float real_const_value);
 //void wml_generate_boolean_const_def(bool boolena_const_value);
 

@@ -13,7 +13,7 @@
 
 identificador identificador_de_procedures[QTD_MAX_IDENTIFICADORES];
 identificador identificador_de_var[QTD_MAX_IDENTIFICADORES];
-identificador identificador_de_int_const[QTD_MAX_IDENTIFICADORES];
+int_const identificador_de_int_const[QTD_MAX_IDENTIFICADORES];
 
 int labels_geradas = 0;
 int labels_adicionadas = 0;
@@ -24,8 +24,8 @@ int qtd_identificador_de_var = 0;
 int qtd_identificador_de_int_const = 0;
 
 /** declaração de funções */
-void wml_generate_int_const_def(int valor_int_const);
-void wml_int_const_def_usage(int valor_int_const);
+void wml_generate_int_const_def(int valor_int_const, int token2);
+void wml_int_const_def_usage(int valor_int_const, int token2);
 //void wml_generate_real_const_def(float real_const_value);
 //void wml_generate_boolean_const_def(bool boolena_const_value);
 
@@ -117,7 +117,7 @@ int get_identifier(int token2, int tipo)
 	}
 }
 
-void wml_generate_int_const_def(int valor_int_const)
+void wml_generate_int_const_def(int valor_int_const, int token2)
 {
 
 	int i;
@@ -129,24 +129,40 @@ void wml_generate_int_const_def(int valor_int_const)
 	printf("CONST INT %d\n", valor_int_const);
 
 	identificador_de_int_const[qtd_identificador_de_int_const].id = qtd_identificador_de_int_const + 1;
-	identificador_de_int_const[qtd_identificador_de_int_const].token2 = valor_int_const;
+	identificador_de_int_const[qtd_identificador_de_int_const].valor = valor_int_const;
+	identificador_de_int_const[qtd_identificador_de_int_const].token2 = token2;
 	++qtd_identificador_de_int_const;
 }
 
-void wml_int_const_def_usage(int valor_int_const)
+void wml_int_const_def_usage(int valor_int_const, int token2)
 {
 	int i;
-	for(i = 0; i < qtd_identificador_de_int_const; ++i)
+
+	if(token2 == T_EOF)
 	{
-		if(identificador_de_int_const[i].token2 == valor_int_const)
+		for(i = 0; i < qtd_identificador_de_int_const; ++i)
 		{
-			printf("LOAD_CONST_S %d\n", identificador_de_int_const[i].id);
-			return ;
+			if(identificador_de_int_const[i].valor == valor_int_const)
+			{
+				printf("LOAD_CONST_S %d\n", identificador_de_int_const[i].id);
+				return ;
+			}
+		}
+	}
+	else
+	{
+		for(i = 0; i < qtd_identificador_de_int_const; ++i)
+		{
+			if(identificador_de_int_const[i].token2 == token2)
+			{
+				printf("LOAD_CONST_S %d\n", identificador_de_int_const[i].id);
+				return ;
+			}
 		}
 	}
 
 	// se a int_const não foi definida, ela é adicionada!
-	wml_generate_int_const_def(valor_int_const);
+	wml_generate_int_const_def(valor_int_const, token2);
 	printf("LOAD_CONST_S %d\n", qtd_identificador_de_int_const);
 }
 
@@ -230,7 +246,6 @@ void wml_generate_print()
 
 void wml_operation_usage(int op1_token2, int op2_token2, int operacao)
 {
-	//printf("op1 = %d, op2 = %d, op = %d\n", op1_token2, op2_token2, operacao);
 
 	if(op2_token2 == T_EOF) return ;
 

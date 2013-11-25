@@ -178,7 +178,7 @@ plus_constant_definition: constant_definition
 
 constant_definition: T_ID T_EQ T_INT_CONST T_SEMICOLON
 {	
-	wml_generate_int_const_def($3);
+	wml_generate_int_const_def($3, $1);
 		
 	if(!insert_const($1, T_INT_CONST))
 	{
@@ -705,7 +705,7 @@ variable_access: T_ID
 constant: T_INT_CONST
 {
 	$$.tipo = T_INT_CONST;
-	wml_int_const_def_usage($1);
+	wml_int_const_def_usage($1, T_EOF);
 }
         | T_REAL_CONST
 {
@@ -719,8 +719,16 @@ constant: T_INT_CONST
 {
 	$$.tipo = $1.tipo;
 	$$.token2 = $1.token2;
-	printf("constant: var_access : ");
-	wml_var_usage($1.token2);
+	printf("tipo var_access %d\n", $1.tipo);
+	
+	if($1.tipo == T_INT_CONST || $1.tipo == T_REAL_CONST || $1.tipo == T_BOOLEAN_CONST)
+	{
+		wml_int_const_def_usage(T_VOID, $1.token2);
+		
+	} else
+	{
+		wml_var_usage($1.token2);
+	}
 }
 ;
 %%
